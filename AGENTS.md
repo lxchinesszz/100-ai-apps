@@ -360,7 +360,106 @@ Web / PWA
 
 ---
 
-## 13. Agent Working Principle
+## 13. Codex Subagent Orchestration
+
+本仓库使用 Codex 主会话作为 **Orchestrator**。主会话负责理解用户目标、判断当前研发阶段、选择和委派子智能体、控制阶段交接、处理用户确认，并汇总最终结果。
+
+项目级自定义子智能体定义在：
+
+```text
+.codex/agents/
+├── product.toml
+├── ui-designer.toml
+├── developer.toml
+└── tester.toml
+```
+
+### 13.1 Agent 职责
+
+```text
+product
+→ 产品需求、范围、业务规则、验收标准
+
+ui_designer
+→ 页面结构、信息层级、交互、状态、视觉设计
+
+developer
+→ 技术方案、改动计划、代码实现、开发验证
+
+tester
+→ 独立测试、回归、验收、PASS / FAIL
+```
+
+主会话本身就是 Orchestrator，不再创建独立 `orchestrator` 子智能体。
+
+### 13.2 推荐协作流程
+
+新 App 或包含明显产品/UI/开发链路的需求，默认按以下阶段组织：
+
+```text
+用户目标
+  ↓
+Orchestrator
+  ↓
+product
+  ↓
+需求方案 / 验收标准
+  ↓
+ui_designer（存在 UI / UX 工作时）
+  ↓
+页面与交互方案
+  ↓
+developer
+  ↓
+技术方案 + 实施
+  ↓
+tester
+  ↓
+PASS ─────────→ Done
+  │
+ FAIL
+  ↓
+Orchestrator
+  ↓
+developer 修复
+  ↓
+tester 复验
+```
+
+不是每个任务都必须调用全部四个 Agent。Orchestrator 应根据任务性质选择最小必要角色，例如纯代码 Bug 可以直接进入 `developer → tester`，纯需求讨论可以只使用 `product`。
+
+### 13.3 委派规则
+
+1. 子智能体仍必须遵循本 `AGENTS.md`、`rules/common/`、对应平台规则和当前需求文档。
+2. Orchestrator 在委派时必须给出明确任务边界、输入上下文和期望返回结果，不把模糊的整个项目直接丢给子智能体。
+3. Product 不决定技术架构；UI Designer 不扩展产品 Scope；Developer 不重写已确认需求；Tester 不修改被测试代码。
+4. `tester` 是独立只读角色。测试失败时，由 Orchestrator 把证据交回 `developer`，修复后重新测试。
+5. 写操作优先按阶段串行执行。不要让多个可写子智能体无协调地同时修改同一文件或同一业务区域。
+6. 只有互不依赖的探索、测试、日志分析、资料核验等读操作任务适合主动并行委派。
+7. 子智能体返回主会话时应提供提炼后的结论、证据和交接信息，不把大量无关中间日志污染主会话。
+8. 用户确认 Gate 仍由 Orchestrator 控制。子智能体不得自行把“分析完成”视为用户已经确认实施。
+
+### 13.4 Agent 与仓库规则的关系
+
+```text
+AGENTS.md
+→ 定义仓库流程与 Orchestrator
+
+.codex/agents/
+→ 定义谁负责执行
+
+rules/
+→ 定义执行时必须遵守的开发规范
+
+requirements/
+→ 定义当前这一次具体要完成什么
+```
+
+子智能体是执行机制，不替代需求文档、开发规则、测试和验收流程。
+
+---
+
+## 14. Agent Working Principle
 
 > 先判断需求归属，再记录需求；先确认方案，再修改代码；文档跟随真实实施同步更新；所有变更可追踪，所有结果可验证。
 
