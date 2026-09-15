@@ -1,8 +1,10 @@
 # iPhone 静态 Web App / PWA 开发规范
 
+> 本规范适用于 `100-ai-apps` 中所有 Web / PWA 应用。核心定位：**Static Web App + PWA + Local First**。
+
 ## 1. 项目定位
 
-本规则适用于采用 **纯前端静态 Web App** 技术方案，并以 iPhone 主屏幕安装体验为主要目标的项目。
+本项目采用 **纯前端静态 Web App** 技术方案。
 
 核心目标：
 
@@ -10,15 +12,13 @@
 
 项目不依赖 App Store，不需要 Apple Developer 账号，不需要打包 IPA。
 
-最终交付物必须可以直接部署到静态文件服务器，例如：
+所有 Web / PWA 应用统一部署到又拍云，统一域名：
 
-- 又拍云
-- Cloudflare Pages
-- GitHub Pages
-- Nginx
-- 任意静态 CDN
+```text
+https://apps.springlearn.cn
+```
 
-部署后用户通过 HTTPS 地址访问即可。
+每个应用使用稳定的英文 `appSlug` 作为访问和部署子目录。
 
 ---
 
@@ -48,28 +48,20 @@ localStorage / IndexedDB
 dist/ 可直接部署
 ```
 
-业务数据默认保存在设备本地。
-
-简单数据使用：
-
-```text
-localStorage
-```
-
-复杂、结构化、大量数据优先：
-
-```text
-IndexedDB
-```
+业务数据默认保存在设备本地。简单数据使用 `localStorage`，复杂、结构化、大量数据优先使用 `IndexedDB`。
 
 ---
 
 ## 3. 最终运行方式
 
-用户使用流程：
-
 ```text
-部署静态网站
+npm run build
+      ↓
+dist/
+      ↓
+上传 dist/ 内文件到又拍云 /<appSlug>/
+      ↓
+https://apps.springlearn.cn/<appSlug>/
       ↓
 iPhone Safari 打开
       ↓
@@ -82,34 +74,38 @@ iPhone Safari 打开
 以后直接点击图标启动
 ```
 
-添加到主屏幕后，应尽可能以独立 Web App 形式运行。
-
-设计和开发时，不应该将其视为「手机网页」。应该将其视为：
-
-> 一个使用 Web 技术实现的 iPhone App。
+设计和开发时，不应该将其视为「手机网页」，而应该将其视为一个使用 Web 技术实现的 iPhone App。
 
 ---
 
 ## 4. PWA 要求
 
-项目必须提供 Web App Manifest，例如：
+每个 App 必须先确定稳定的英文 `appSlug`，使用 kebab-case，例如：
+
+```text
+speaking-training
+travel-budget
+```
+
+Manifest 必须按应用子目录配置。以 `speaking-training` 为例：
 
 ```json
 {
   "name": "应用名称",
   "short_name": "应用名称",
-  "start_url": "/",
+  "start_url": "/speaking-training/",
+  "scope": "/speaking-training/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "/speaking-training/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/speaking-training/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
@@ -117,47 +113,27 @@ iPhone Safari 打开
 }
 ```
 
-其中：
+`display: standalone` 是重要配置。`start_url` 和 `scope` 必须与 `/<appSlug>/` 一致。
 
-```text
-display: standalone
-```
-
-是重要配置。
-
-禁止把安装后的应用设计成仍然依赖 Safari 地址栏和浏览器工具栏操作。
+禁止假设 App 部署在域名根路径 `/`。
 
 ---
 
 ## 5. iOS Web App 配置
 
-HTML 必须配置适用于 iPhone 的 viewport：
+HTML 必须配置：
 
 ```html
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1, viewport-fit=cover"
-/>
-```
-
-同时配置：
-
-```html
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta
-  name="apple-mobile-web-app-status-bar-style"
-  content="black-translucent"
->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="应用名称">
 ```
 
-提供 Apple Touch Icon：
+Apple Touch Icon 必须兼容应用子目录，例如：
 
 ```html
-<link
-  rel="apple-touch-icon"
-  href="/icons/apple-touch-icon.png"
->
+<link rel="apple-touch-icon" href="/speaking-training/icons/apple-touch-icon.png">
 ```
 
 目标是从 iPhone 主屏幕启动后获得尽可能接近独立 App 的体验。
@@ -166,34 +142,7 @@ HTML 必须配置适用于 iPhone 的 viewport：
 
 ## 6. 全屏设计原则
 
-这是本项目非常重要的 UI 规范。
-
-页面必须使用整个设备可用屏幕空间。
-
-禁止按照传统 H5 网页方式设计：
-
-```text
-Safari Header
-↓
-网页内容
-↓
-Safari Bottom Bar
-```
-
-正确理解应该是：
-
-```text
-┌───────────────────────┐
-│     iPhone 顶部区域    │
-│                       │
-│                       │
-│        App UI         │
-│                       │
-│                       │
-│                       │
-│     Home Indicator    │
-└───────────────────────┘
-```
+页面必须使用整个设备可用屏幕空间。禁止按照传统 H5 的 Safari Header + 网页内容 + Safari Bottom Bar 方式设计。
 
 App 背景必须能够延伸到屏幕顶部和底部。
 
@@ -201,21 +150,7 @@ App 背景必须能够延伸到屏幕顶部和底部。
 
 ## 7. 禁止直接使用 100vh
 
-移动 Safari 存在动态 viewport 问题。
-
-业务主容器不要简单写：
-
-```css
-height: 100vh;
-```
-
-优先使用：
-
-```css
-min-height: 100dvh;
-```
-
-基础结构：
+业务主容器不要简单使用 `height: 100vh`，优先：
 
 ```css
 html,
@@ -226,20 +161,9 @@ body,
   min-height: 100%;
 }
 
-body {
-  min-height: 100dvh;
-}
-
-#root {
-  min-height: 100dvh;
-}
-```
-
-App 主容器：
-
-```css
+body,
+#root,
 .app {
-  width: 100%;
   min-height: 100dvh;
 }
 ```
@@ -248,14 +172,7 @@ App 主容器：
 
 ## 8. Safe Area 适配
 
-必须适配：
-
-- 刘海
-- Dynamic Island / 灵动岛
-- iPhone 圆角屏幕
-- Home Indicator
-
-使用：
+必须适配刘海、Dynamic Island / 灵动岛、iPhone 圆角屏幕和 Home Indicator：
 
 ```css
 env(safe-area-inset-top)
@@ -264,65 +181,18 @@ env(safe-area-inset-left)
 env(safe-area-inset-right)
 ```
 
-例如：
-
-```css
-.app-content {
-  padding-top: env(safe-area-inset-top);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-```
-
-注意：**Safe Area 不应该简单加在整个页面背景上。**
-
-正确方式是：
+原则：
 
 ```text
-背景
-→ 延伸至整个物理屏幕
-
-内容
-→ 避开 Safe Area
+背景 → 延伸至整个物理屏幕
+内容 → 避开 Safe Area
 ```
-
-例如：
-
-```css
-.app {
-  min-height: 100dvh;
-  background: var(--app-background);
-}
-
-.app-content {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-```
-
-这样背景可以进入灵动岛附近区域，但按钮、文字等重要内容不会被遮挡。
 
 ---
 
 ## 9. 顶部导航设计
 
-不要照搬普通网页 Header。
-
-推荐：
-
-```text
-┌──────────────────────┐
-│      Safe Area       │
-│                      │
-│  ←     页面标题    ··· │
-│                      │
-│      页面内容         │
-```
-
-顶部导航应该与 Safe Area 联动。
-
-例如：
+不要照搬普通网页 Header。顶部导航必须与 Safe Area 联动：
 
 ```css
 .app-header {
@@ -331,48 +201,18 @@ env(safe-area-inset-right)
 }
 ```
 
-真正导航内容高度保持约：
-
-```text
-44px ～ 56px
-```
+真正导航内容高度保持约 `44px ～ 56px`。
 
 ---
 
 ## 10. 底部导航设计
 
-如果存在 TabBar：
-
-```text
-首页
-训练
-记录
-我的
-```
-
-必须考虑 Home Indicator。
-
-不要写死：
-
-```css
-height: 60px;
-```
-
-应该设计为：
+存在 TabBar 时必须考虑 Home Indicator：
 
 ```css
 .tabbar {
+  min-height: calc(64px + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-}
-```
-
-例如：
-
-```css
-.tabbar {
-  min-height: calc(
-    64px + env(safe-area-inset-bottom)
-  );
 }
 ```
 
@@ -382,7 +222,7 @@ height: 60px;
 
 ## 11. 页面滚动
 
-默认：
+默认采用：
 
 ```text
 App Shell 固定
@@ -390,7 +230,7 @@ App Shell 固定
 Content 独立滚动
 ```
 
-推荐结构：
+推荐：
 
 ```text
 App
@@ -399,59 +239,23 @@ App
 └── TabBar
 ```
 
-不要让 Header、TabBar、整个页面一起随浏览器页面滚动。
-
-页面应该表现得更像原生 App。
+Header 和 TabBar 不应随整个浏览器页面一起滚动。
 
 ---
 
 ## 12. 禁止出现网页感
 
-UI 设计时避免明显的传统网页特征。
+避免网页式导航栏、大面积 PC Header、Footer、友情链接、面包屑、浏览器式分页、PC 表格和 Hover 驱动交互。
 
-避免：
-
-```text
-网页式导航栏
-大面积 PC Header
-Footer
-友情链接
-网页面包屑
-浏览器式分页
-PC 表格
-Hover 驱动交互
-```
-
-优先采用移动 App 交互：
-
-```text
-Bottom TabBar
-Sheet
-Bottom Sheet
-Segmented Control
-Swipe
-Modal
-Toast
-Action Sheet
-长按
-触摸反馈
-```
+优先采用 Bottom TabBar、Sheet、Bottom Sheet、Segmented Control、Swipe、Modal、Toast、Action Sheet、长按和触摸反馈。
 
 ---
 
 ## 13. Touch 交互
 
-所有核心操作必须适合触摸。
+核心操作必须适合触摸。按钮点击区域建议至少 `44 × 44px`。不要依赖 hover、右键或鼠标悬浮才能发现功能。
 
-按钮点击区域建议至少：
-
-```text
-44 × 44px
-```
-
-不要设计只能依靠 hover、右键、鼠标悬浮才能发现的功能。
-
-点击应该有明确反馈，例如：
+轻量点击反馈示例：
 
 ```css
 button:active {
@@ -459,21 +263,11 @@ button:active {
 }
 ```
 
-但动画应该轻量，不影响响应速度。
-
 ---
 
 ## 14. 禁止页面意外缩放
 
-输入框字体不要小于：
-
-```text
-16px
-```
-
-避免 iOS Safari 聚焦输入框时自动放大页面。
-
-例如：
+输入框字体不要小于 `16px`：
 
 ```css
 input,
@@ -483,96 +277,31 @@ select {
 }
 ```
 
+避免 iOS Safari 聚焦输入框时自动放大页面。
+
 ---
 
 ## 15. 本地数据
 
-没有明确要求服务器时：**禁止 AI 自行增加后端。**
+没有明确要求服务器时，**禁止 AI 自行增加后端**。
 
-例如用户的：
+打卡记录、训练进度、预算、消费记录、设置、主题、历史记录、草稿等默认保存到本机。
 
-```text
-打卡记录
-训练进度
-预算
-消费记录
-设置
-主题
-历史记录
-草稿
-```
-
-默认保存到本机。
-
-简单应用：
-
-```text
-localStorage
-```
-
-较复杂应用：
-
-```text
-IndexedDB
-```
-
-必须考虑数据结构版本升级。
+简单应用使用 `localStorage`，较复杂应用使用 `IndexedDB`，并考虑数据结构版本升级。
 
 ---
 
 ## 16. 离线运行
 
-如果项目要求具有真正的「App 感」，应配置 Service Worker。
+纯本地工具应该优先支持离线运行。需要真正 App 感时配置 Service Worker，使 HTML、CSS、JavaScript、字体、图标和核心静态图片在首次加载后进入合理缓存。
 
-目标：第一次联网访问并加载完成后：
-
-```text
-HTML
-CSS
-JavaScript
-字体
-图标
-核心静态图片
-```
-
-进入本地缓存。
-
-之后在合理的缓存策略下：
-
-```text
-无网络
-↓
-点击桌面 App
-↓
-仍然可以启动
-↓
-核心功能可以使用
-```
-
-纯本地工具应该优先支持离线运行。
+Service Worker 必须限制在当前 `/<appSlug>/` scope 内，禁止控制其他 App 的目录。
 
 ---
 
 ## 17. 网络依赖原则
 
-核心功能不得依赖第三方 CDN。
-
-禁止：
-
-```html
-<script src="https://cdn.xxx.com/..."></script>
-```
-
-核心 JS、CSS、字体、图标、图片尽量随项目一起构建和部署。
-
-否则断网后可能出现：
-
-```text
-页面能打开
-但字体丢失
-图标丢失
-JS 失效
-```
+核心功能不得依赖第三方 CDN。核心 JS、CSS、字体、图标、图片尽量随项目一起构建和部署，避免离线时字体、图标或 JS 失效。
 
 ---
 
@@ -591,169 +320,65 @@ font-family:
   sans-serif;
 ```
 
-中文环境可以继续依赖系统字体 fallback。
-
-不应为了模仿 Apple UI 强制在线加载字体。
+中文环境继续依赖系统字体 fallback，不应为了模仿 Apple UI 强制在线加载字体。
 
 ---
 
 ## 19. 图片与资源
 
-静态资源统一进入：
+静态资源进入 `/public` 或经过 Vite 构建。不要依赖远程图片作为核心 UI。
 
-```text
-/public
-```
-
-或者经过 Vite 构建。
-
-不要依赖远程图片作为核心 UI。
-
-例如：
-
-```text
-/public
-  /icons
-  /images
-  /illustrations
-```
-
-保证整个应用可以独立部署。
+部署在子目录时，禁止无意识使用指向域名根目录的 `/icons/...`、`/images/...` 等路径。最终资源 URL 必须位于当前 `/<appSlug>/` 下，或由 Vite `base` 正确处理。
 
 ---
 
 ## 20. 页面路由
 
-纯静态部署必须考虑刷新问题。
-
-如果服务器无法配置 SPA fallback，优先：
+纯静态又拍云子目录部署默认优先使用 Hash Router：
 
 ```text
-Hash Router
+https://apps.springlearn.cn/<appSlug>/#/
+https://apps.springlearn.cn/<appSlug>/#/training
+https://apps.springlearn.cn/<appSlug>/#/history
 ```
 
-例如：
+这样刷新不会因为静态服务器缺少 SPA fallback 而产生 404。
 
-```text
-/#/
-/#/training
-/#/history
-/#/settings
-```
-
-这样直接部署到 CDN / 对象存储也不会因为刷新子路由产生 404。
-
-如果部署环境明确支持 SPA fallback，再使用 Browser Router。
+只有部署环境明确配置 SPA fallback 时才考虑 Browser Router。
 
 ---
 
 ## 21. 更新机制
 
-用户从桌面启动 Web App 后，也应该能够获取新版本。
+Service Worker 不允许无限缓存旧 JS。必须设计 `Cache Version + Update Strategy`。
 
-Service Worker 不允许无限缓存旧 JS。
-
-必须设计合理的：
-
-```text
-Cache Version
-+
-Update Strategy
-```
-
-当发现新版本时，可以后台更新，或者提示：
-
-```text
-发现新版本
-[立即更新]
-```
+发现新版本时可以后台更新，或者提示用户“发现新版本 / 立即更新”。缓存 key 建议包含 `appSlug` 和版本号，避免同域名下不同 App 的缓存命名冲突。
 
 ---
 
 ## 22. UI 设计尺寸
 
-设计稿以现代 iPhone 竖屏为主要目标。
+设计稿以现代 iPhone 竖屏为主要目标，建议按 `393 × 852` 附近逻辑尺寸设计，但代码禁止固定手机宽高。
 
-建议按照：
-
-```text
-393 × 852
-```
-
-附近的逻辑尺寸进行设计。
-
-但代码禁止固定：
-
-```text
-width: 393px;
-height: 852px;
-```
-
-必须响应式适配不同 iPhone。
-
-支持至少：
-
-```text
-375px
-390px
-393px
-402px
-430px
-```
-
-等常见手机宽度。
+至少适配 `375px / 390px / 393px / 402px / 430px` 等常见手机宽度。
 
 ---
 
 ## 23. 横屏
 
-除非产品明确需要，否则：
-
-> 默认以竖屏体验为第一优先级。
-
-横屏保证页面不崩坏即可，不需要专门设计复杂横屏 UI。
+除非产品明确需要，否则默认以竖屏体验为第一优先级。横屏保证页面不崩坏即可。
 
 ---
 
 ## 24. 状态栏与主题
 
-页面背景色、Manifest 中的：
-
-```json
-"theme_color"
-```
-
-以及 HTML：
-
-```html
-<meta name="theme-color">
-```
-
-应该保持一致。
-
-如果页面顶部是深色，状态栏区域也应该自然融入深色背景。
-
-如果页面顶部是浅色，状态栏区域自然融入浅色背景。
-
-目标是减少：
-
-> 「上面是系统、下面是网页」
-
-这种明显割裂感。
+页面背景色、Manifest `theme_color` 和 HTML `<meta name="theme-color">` 应保持一致，使状态栏区域自然融入 App 背景，减少“上面是系统、下面是网页”的割裂感。
 
 ---
 
 ## 25. AI 开发约束
 
-当 AI 根据本规范开发项目时，不要询问：
-
-```text
-是否需要后端？
-是否需要数据库？
-是否需要 App Store？
-```
-
-除非业务明确要求。
+AI 不应主动询问是否需要后端、数据库或 App Store，除非业务明确要求。
 
 默认直接按照：
 
@@ -767,36 +392,21 @@ Local First
 
 实现。
 
-禁止擅自增加：
+禁止擅自增加 Node Server、Spring Boot、MySQL、PostgreSQL、Firebase、Supabase、登录服务器和云数据库。
 
-```text
-Node Server
-Spring Boot
-MySQL
-PostgreSQL
-Firebase
-Supabase
-登录服务器
-云数据库
-```
-
-如果业务明确出现账号、跨设备同步、多人共享、服务端计算等能力，应先进入当前 App 的需求与技术方案流程，明确偏离本默认规则后再实施，不得由 AI 自行升级架构。
+如果业务明确出现账号、跨设备同步、多人共享、服务端计算等能力，应先进入当前 App 的需求与技术方案流程，明确偏离本默认规则后再实施。
 
 ---
 
 ## 26. AI UI 设计原则
 
-AI 在生成 UI 时，必须首先考虑：
+AI 生成 UI 时首先考虑：
 
 ```text
 这是一个安装在 iPhone 主屏幕上的 App
 ```
 
-而不是：
-
-```text
-这是一个响应式手机网页
-```
+而不是响应式手机网页。
 
 设计优先级：
 
@@ -812,50 +422,102 @@ App 感
 网页兼容性
 ```
 
-所有页面都需要考虑：
-
-```text
-Safe Area
-Dynamic Island
-Home Indicator
-Bottom TabBar
-触摸区域
-滚动区域
-键盘弹出
-```
+所有页面需要考虑 Safe Area、Dynamic Island、Home Indicator、Bottom TabBar、触摸区域、滚动区域和键盘弹出。
 
 ---
 
-## 27. 验收标准
+## 27. 统一域名与又拍云部署规范
+
+所有 Web / PWA 应用统一部署到又拍云，统一域名：
+
+```text
+https://apps.springlearn.cn
+```
+
+每个应用必须定义稳定的英文 `appSlug`，建议使用 kebab-case。应用名、URL 子目录、又拍云目录和构建 base 必须使用同一个 slug。
+
+例如：
+
+```text
+appSlug
+speaking-training
+
+访问地址
+https://apps.springlearn.cn/speaking-training/
+
+又拍云目录
+/speaking-training/
+
+Vite base
+/speaking-training/
+
+Manifest start_url
+/speaking-training/
+
+Manifest scope
+/speaking-training/
+```
+
+Vite 示例：
+
+```ts
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  base: '/speaking-training/'
+})
+```
+
+部署时上传的是 `dist/` **内部的全部文件**，目标为又拍云 `/<appSlug>/`，不要再额外嵌套一层 `dist`：
+
+```text
+dist/index.html
+→ /<appSlug>/index.html
+
+dist/assets/...
+→ /<appSlug>/assets/...
+```
+
+禁止部署成：
+
+```text
+/<appSlug>/dist/index.html
+```
+
+`appSlug` 一旦发布并被用户添加到主屏幕，应视为稳定标识，不应随意修改。
+
+---
+
+## 28. 验收标准
 
 AI 完成项目后必须检查：
 
 - [ ] `npm run build` 可以成功执行。
-- [ ] `dist/` 可以独立部署。
-- [ ] 不需要服务器运行时。
-- [ ] Safari 可以正常访问。
-- [ ] 可以添加到 iPhone 主屏幕。
+- [ ] `dist/` 可以独立部署，不需要服务器运行时。
+- [ ] 已定义稳定的英文 `appSlug`。
+- [ ] Vite `base` 为 `/<appSlug>/`。
+- [ ] Manifest `start_url` 和 `scope` 为 `/<appSlug>/`。
+- [ ] App Icon、Manifest、JS、CSS、图片等资源在子目录下正确加载。
+- [ ] Service Worker scope 不越过当前 `/<appSlug>/`。
+- [ ] `dist/` 内文件可直接上传到又拍云 `/<appSlug>/`。
+- [ ] `https://apps.springlearn.cn/<appSlug>/` 可以正常访问。
+- [ ] Hash Router 路由刷新不会 404。
+- [ ] Safari 可以正常访问并添加到 iPhone 主屏幕。
 - [ ] 从桌面启动后以独立 Web App 方式运行。
 - [ ] 页面背景覆盖整个屏幕区域。
 - [ ] 安装后不依赖 Safari 地址栏和浏览器工具栏完成核心操作。
-- [ ] 正确适配 Dynamic Island / 刘海。
-- [ ] 正确适配 Home Indicator。
+- [ ] 正确适配 Dynamic Island / 刘海和 Home Indicator。
 - [ ] 不出现顶部、底部异常白边。
-- [ ] 不使用固定手机高度。
-- [ ] 正确使用 `100dvh`。
+- [ ] 不使用固定手机高度，正确使用 `100dvh`。
 - [ ] 输入框不会触发异常页面放大。
-- [ ] 数据能够保存在本机。
-- [ ] 刷新页面不会导致数据丢失。
-- [ ] 静态部署情况下路由不会 404。
+- [ ] 数据能够保存在本机，刷新页面不会导致数据丢失。
 - [ ] 核心资源不存在不必要的第三方 CDN 依赖。
-- [ ] 配置 PWA / Manifest / App Icon。
+- [ ] 已配置 PWA / Manifest / App Icon。
 - [ ] 如果要求离线模式，断网后核心功能仍然可使用。
 
 ---
 
-## 28. 最终技术架构
-
-统一采用：
+## 29. 最终技术架构
 
 ```text
 ┌──────────────────────────────┐
@@ -863,25 +525,20 @@ AI 完成项目后必须检查：
 │                              │
 │    Home Screen Web App       │
 │                              │
-│  ┌────────────────────────┐  │
-│  │ React + TypeScript     │  │
-│  │                        │  │
-│  │ App UI                 │  │
-│  │                        │  │
-│  │ Local Storage          │  │
-│  │ IndexedDB              │  │
-│  │ Service Worker         │  │
-│  └────────────────────────┘  │
-│                              │
+│  React + TypeScript + PWA    │
+│  LocalStorage / IndexedDB    │
 └───────────────┬──────────────┘
                 │
           首次访问 / 更新
                 │
                 ▼
+https://apps.springlearn.cn/<appSlug>/
+                │
+                ▼
 ┌──────────────────────────────┐
-│       Static Hosting         │
+│           又拍云             │
 │                              │
-│         dist/                │
+│       /<appSlug>/            │
 │                              │
 │ HTML / CSS / JS / Assets     │
 └──────────────────────────────┘
@@ -896,5 +553,7 @@ AI 完成项目后必须检查：
 > 能通过 PWA 获得 App 体验，不为了上架而开发原生 App。
 
 > UI 从第一天就按照 iPhone App 设计，而不是开发完成后再把网页“适配成手机端”。
+
+> 所有 Web / PWA 应用统一发布到 `https://apps.springlearn.cn/<appSlug>/`。
 
 > 最终产物应该做到：打开 Safari → 添加到主屏幕 → 从此以后用户基本不需要意识到它是一个网页。
