@@ -23,124 +23,137 @@ Agent 的目标不是尽快修改代码，而是确保每一次代码或仓库�
 
 ## 3. Mandatory Change Workflow
 
-### 3.1 触发条件
+### 3.1 什么时候必须创建需求
 
-只要 Agent 识别到任务将导致任何 **代码或仓库文件改动**，就必须进入本流程。
+只要 Agent 识别到任务将导致任何 **代码或仓库文件改动**，就必须进入需求流程。
 
 包括但不限于：
 
-- 新功能
-- 功能调整
+- 新功能或功能调整
 - Bug 修复
 - UI / UX 调整
-- 重构
-- 性能优化
+- 重构或性能优化
 - 测试补充或修改
-- 配置修改
-- 构建脚本修改
-- CI / CD 修改
+- 配置、构建脚本、CI / CD 修改
 - 依赖升级
 - 文档修改
 - 目录结构调整
-- 删除文件
+- 文件新增、修改或删除
 
-不得以以下理由跳过：
+不得以“改动很小”“只是修 Bug”“只改一行代码”“只补测试/配置/文档”或“不影响业务逻辑”为由跳过。
 
-- “改动很小”
-- “只是修一个 Bug”
-- “只是改一行代码”
-- “只是补测试”
-- “只是改配置”
-- “只是改文档”
-- “不影响业务逻辑”
+### 3.2 可以不创建需求的情况
 
-**原则：只要产生仓库变更，就必须留下需求记录。**
+以下工作在 **不修改任何仓库文件** 时，可以不创建需求目录：
 
-### 3.2 实施前强制动作
+- 纯只读查询
+- 代码解释
+- 方案讨论
+- 代码审查
+- 故障诊断
 
-Agent 在修改业务代码、配置、测试或其他目标文件之前，必须依次完成：
+一旦上述任务后续转为实施修改，必须立即停止直接修改，先补齐需求目录、三份需求文档和需求总清单，再进入方案确认与实施流程。
+
+### 3.3 标准流程
 
 ```text
-识别改动
+识别仓库改动
   ↓
 创建需求目录
   ↓
-创建三份需求文档
+从模板创建三份需求文档
   ↓
-登记需求总清单
+登记 docs/requirements/README.md
   ↓
-输出实施方案
+完成需求方案
   ↓
-等待方案确认
+完成技术方案
   ↓
-实施代码 / 文件改动
+记录计划改动范围
   ↓
-测试与验收
+向用户说明方案并取得确认
   ↓
-更新需求记录
+实施代码 / 仓库文件改动
+  ↓
+验证
+  ↓
+更新三份文档的实际结果
+  ↓
+更新需求总清单状态
 ```
 
-在前三项记录动作完成之前，不得直接进入代码实施。
+在用户确认方案前，只允许分析问题、阅读代码、澄清需求和完善文档，不得修改业务代码。
 
 ---
 
 ## 4. Requirement Directory
 
-所有会导致仓库改动的任务，都必须创建独立需求目录。
-
-统一存放：
+所有需求统一存放在：
 
 ```text
-requirements/
+docs/requirements/
 ```
+
+每次需求都必须建立独立目录，不得把多个无关需求合并归档。
 
 目录命名格式：
 
 ```text
-requirements/YYYYMMDD-NNN-short-name/
+docs/requirements/<YYYYMMDD>-<requirement-slug>/
 ```
 
 例如：
 
 ```text
-requirements/
+docs/requirements/
 ├── README.md
-├── 20260915-001-add-checkin/
-├── 20260915-002-fix-budget-calc/
-└── 20260916-001-pwa-fullscreen/
+├── _template/
+├── 20260915-add-checkin/
+├── 20260915-fix-budget-calc/
+└── 20260916-pwa-fullscreen/
 ```
 
-规则：
+其中：
 
 - `YYYYMMDD`：需求创建日期。
-- `NNN`：当天从 `001` 开始递增。
-- `short-name`：使用简短、可读的英文 kebab-case。
+- `requirement-slug`：简短英文 kebab-case 标识。
 - 一个独立问题对应一个需求目录。
-- 不得把多个无关改动塞进同一个需求目录。
+- 如果存在正式需求编号，应在该目录的需求文档和需求总清单中同时记录该编号。
+
+新需求文档必须从：
+
+```text
+docs/requirements/_template/
+```
+
+复制后填写，不应每次自由创建不同格式。
 
 ---
 
-## 5. Three Required Documents
+## 5. Required Documents
 
-每个需求目录必须创建以下三份文档：
+每个需求目录必须包含：
 
 ```text
-requirements/YYYYMMDD-NNN-short-name/
+docs/requirements/<YYYYMMDD>-<requirement-slug>/
 ├── requirement.md
-├── solution.md
-└── acceptance.md
+├── technical-design.md
+└── change-list.md
 ```
 
-三份文档缺一不可。
+三份文档缺一不可，并且必须随需求澄清、方案调整和实际实施结果持续同步更新。
 
-### 5.1 requirement.md
+### 5.1 requirement.md — 需求方案
 
-记录“为什么要改、要解决什么问题”。
+用于定义“为什么做、做什么、做到什么程度”。
 
 至少包含：
 
 ```markdown
 # Requirement
+
+## Requirement ID
+无正式编号时写“无”。
 
 ## Background
 为什么提出这个需求。
@@ -149,7 +162,10 @@ requirements/YYYYMMDD-NNN-short-name/
 当前存在什么问题。
 
 ## Goal
-本次修改希望达到什么结果。
+希望达到什么结果。
+
+## User / Scenario
+谁在什么场景下使用。
 
 ## Scope
 本次包含哪些内容。
@@ -157,87 +173,115 @@ requirements/YYYYMMDD-NNN-short-name/
 ## Out of Scope
 明确本次不处理什么。
 
-## User / Scenario
-谁在什么场景下使用。
+## Acceptance Criteria
+- [ ] 可观察、可验证的验收项
 ```
 
-### 5.2 solution.md
+### 5.2 technical-design.md — 技术方案
 
-记录“准备怎么改”。
+用于定义“准备怎么实现”。
 
 至少包含：
 
 ```markdown
-# Solution
+# Technical Design
+
+## Requirement ID
+无正式编号时写“无”。
 
 ## Current State
-现有实现和相关代码情况。
+现有实现、相关模块和代码情况。
 
 ## Proposed Solution
-准备采用的方案。
+准备采用的实现方案。
 
-## Files To Change
-预计修改哪些文件。
+## Architecture / Flow
+涉及的架构、调用链或数据流。
 
-## Data / State Changes
-数据结构、状态、存储是否变化。
+## Data / API / Storage
+数据库、接口、状态、缓存、本地存储等影响；无则写“无”。
+
+## Compatibility
+兼容性和已有功能影响；无则写“无”。
 
 ## Risks
 可能产生的风险。
 
 ## Alternatives
-如果存在其他合理方案，说明为什么不采用。
+其他合理方案以及未采用原因；无则写“无”。
 
 ## Implementation Steps
 具体实施步骤。
+
+## Verification Plan
+计划如何验证实现结果。
 ```
 
-### 5.3 acceptance.md
+### 5.3 change-list.md — 改动点
 
-记录“怎么证明已经完成”。
+用于同时记录 **计划改动** 和 **实际改动**。
 
-至少包含：
+实施前必须填写计划范围，至少包含：
 
 ```markdown
-# Acceptance
+# Change List
 
-## Acceptance Criteria
-- [ ] 验收项 1
-- [ ] 验收项 2
+## Requirement ID
+无正式编号时写“无”。
 
-## Test Plan
-如何验证功能。
+## Planned Changes
 
-## Regression Check
-需要回归哪些已有功能。
+### Files
+计划新增 / 修改 / 删除哪些文件。
 
-## Result
-实施完成后填写实际结果。
+### Database
+数据库影响；无则写“无”。
+
+### API
+接口影响；无则写“无”。
+
+### Configuration
+配置影响；无则写“无”。
+
+### Tests
+计划新增或调整的测试；无则写“无”。
+
+## Actual Changes
+实施完成后填写实际修改文件和实际影响。
+
+## Verification Result
+记录执行的验证方式、结果及未解决问题。
 ```
 
-验收标准必须尽可能具体、可观察、可验证，避免使用“正常”“没问题”“体验良好”等模糊描述。
+任何无改动的类别都必须明确填写 **“无”**，不得省略，以便 Agent 和人工审查时区分“没有影响”和“忘记分析”。
 
 ---
 
 ## 6. Requirement Registry
 
-必须维护需求总清单：
+需求总清单固定为：
 
 ```text
-requirements/README.md
+docs/requirements/README.md
 ```
 
-每创建一个需求目录，Agent 必须同步登记。
+这是仓库需求的唯一总索引。
+
+每创建一个新需求目录，Agent 必须立即在总清单新增一条记录，并使用相对链接指向需求目录或 `requirement.md`。
+
+不得只创建需求目录而遗漏总清单。
 
 推荐格式：
 
 ```markdown
 # Requirements
 
-| ID | Requirement | Type | Status | Created |
+| Requirement ID | Requirement | Status | Created | Document |
 |---|---|---|---|---|
-| 20260915-001 | Add Check-in | Feature | Proposed | 2026-09-15 |
+| - | Add Check-in | Proposed | 2026-09-15 | [View](./20260915-add-checkin/requirement.md) |
 ```
+
+如果存在正式需求编号，用真实编号替换 `-`。
 
 状态统一使用：
 
@@ -250,7 +294,7 @@ Rejected
 Archived
 ```
 
-流程：
+标准流转：
 
 ```text
 Proposed
@@ -262,80 +306,109 @@ Implementing
 Done
 ```
 
-在用户确认方案之前，状态保持 `Proposed`。
+需求澄清和方案设计阶段保持 `Proposed`。
 
 ---
 
-## 7. Plan Confirmation Gate
+## 7. Template Rules
 
-完成需求目录、三份文档和总清单登记之后，Agent 必须向用户说明：
-
-1. 对问题的理解。
-2. 准备采用的解决方案。
-3. 预计修改的主要文件。
-4. 可能影响的现有功能。
-5. 验收方式。
-
-然后等待用户确认。
-
-**用户未确认方案前，不得实施目标代码改动。**
-
-用户明确表达以下类似含义时，可以视为确认：
+需求模板固定存放在：
 
 ```text
-可以
-同意
-开始
-执行
-按这个方案做
-直接改
+docs/requirements/_template/
+├── requirement.md
+├── technical-design.md
+└── change-list.md
 ```
 
-如果用户明确要求“不要确认，直接实施”，仍然必须创建需求目录、三份文档和登记总清单，只是可以在完成记录后直接进入实施，不再额外等待确认。
+新需求必须以模板为基础复制创建。
+
+模板发生升级时：
+
+- 新需求使用最新模板。
+- 已存在需求不要求机械迁移。
+- 如果旧需求重新进入大规模实施，可根据实际情况补齐最新字段。
 
 ---
 
-## 8. Implementation Rules
+## 8. Plan Confirmation Gate
+
+开始业务代码修改前，必须先完成：
+
+1. `requirement.md` 需求方案。
+2. `technical-design.md` 技术方案。
+3. `change-list.md` 计划改动范围。
+4. `docs/requirements/README.md` 总清单登记。
+5. 用户方案确认。
+
+Agent 向用户确认方案时，应至少说明：
+
+- 对需求和问题的理解。
+- 推荐解决方案。
+- 核心技术实现。
+- 预计修改范围。
+- 数据库 / API / 配置影响。
+- 风险和兼容性影响。
+- 验证方式。
+
+**用户未确认时，只允许分析和完善方案，不实施业务代码。**
+
+用户明确表达“可以”“同意”“开始”“执行”“按这个方案做”等含义时，可以视为确认。
+
+如果用户明确要求“不要确认，直接实施”，仍然必须先建立需求目录、三份文档并登记总清单；完成这些记录后可以直接进入实施。
+
+---
+
+## 9. Implementation Rules
 
 方案确认后：
 
-1. 将需求状态更新为 `Approved` / `Implementing`。
-2. 严格按照 `solution.md` 实施。
-3. 如果实施过程中发现方案需要明显变化，先更新 `solution.md`。
-4. 如果变化会扩大 Scope、改变核心交互、架构或数据模型，应重新请求用户确认。
-5. 不顺手修改与当前需求无关的问题。
-6. 不进行未经记录的大范围重构。
+1. 将总清单状态更新为 `Approved` / `Implementing`。
+2. 按 `technical-design.md` 实施。
+3. 不顺手修改与当前需求无关的问题。
+4. 不进行未经记录的大范围重构。
+5. 实际修改范围与计划不一致时，必须同步更新 `change-list.md`。
+6. 技术方案发生变化时，必须同步更新 `technical-design.md`。
+7. 需求 Scope 或验收标准发生变化时，必须同步更新 `requirement.md`。
+8. 如果变化会扩大 Scope、改变核心交互、架构、数据模型或外部接口，应重新取得用户确认后继续。
+
+需求文档必须描述 **当前真实状态**，不能只保留最初方案。
 
 ---
 
-## 9. Completion Rules
+## 10. Completion Rules
 
 代码完成不代表需求完成。
 
-Agent 必须根据 `acceptance.md` 执行验证。
+实施完成后，Agent 必须：
 
-完成后：
+1. 在 `change-list.md` 补充实际新增、修改、删除的文件。
+2. 补充实际数据库影响；无则写“无”。
+3. 补充实际 API 影响；无则写“无”。
+4. 补充实际配置影响；无则写“无”。
+5. 记录测试和验证结果。
+6. 对照 `requirement.md` 的 Acceptance Criteria 验收。
+7. 记录未解决问题和已知限制。
+8. 验收通过后将 `docs/requirements/README.md` 状态更新为 `Done`。
 
-1. 勾选已通过的 Acceptance Criteria。
-2. 在 `Result` 中记录实际结果。
-3. 记录未解决问题或已知限制。
-4. 将 `requirements/README.md` 对应状态更新为 `Done`。
-5. 如果验收失败，不得标记为 `Done`。
+如果验收失败，不得标记为 `Done`。
 
 完成定义：
 
 ```text
 Requirement Recorded
-+ Solution Approved
++ Technical Design Approved
++ Change Scope Recorded
 + Implementation Finished
-+ Tests Passed
++ Documents Synced
++ Verification Passed
 + Acceptance Passed
 = Done
 ```
 
 ---
 
-## 10. Rule Loading
+## 11. Rule Loading
 
 开发任何 App 前，Agent 必须先读取通用规则，再根据应用类型读取对应平台规则。
 
@@ -374,14 +447,14 @@ Web / PWA
 
 ---
 
-## 11. Priority
+## 12. Priority
 
 发生规则冲突时，在仓库规则范围内按以下优先级处理：
 
 ```text
 用户当前明确指令
 ↓
-当前需求 requirement.md / 已确认 solution.md
+当前需求 requirement.md / 已确认 technical-design.md
 ↓
 具体平台规则 rules/<platform>/
 ↓
@@ -398,11 +471,11 @@ Web / PWA
 
 ---
 
-## 12. Agent Working Principle
+## 13. Agent Working Principle
 
-Agent 在本仓库中的工作方式应当是：
+Agent 在本仓库中的工作方式：
 
-> 先记录需求，再确认方案；先定义验收，再修改代码；所有变更可追踪，所有结果可验证。
+> 先记录需求，再确认方案；先明确改动范围，再修改代码；文档跟随真实实施同步更新；所有变更可追踪，所有结果可验证。
 
 不要把“快速生成代码”作为第一目标。
 
