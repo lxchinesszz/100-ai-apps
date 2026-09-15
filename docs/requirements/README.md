@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | - | Bootstrap requirement templates | Done | 2026-09-15 | [查看](./20260915-bootstrap-requirement-templates/requirement.md) |
 | - | Use uploaded requirement templates | Done | 2026-09-15 | [查看](./20260915-use-uploaded-requirement-templates/requirement.md) |
-| - | 按 App 归档需求 | Implementing | 2026-09-15 | [查看](./20260915-app-scoped-requirements/requirement.md) |
+| - | 按 App 归档需求 | Done | 2026-09-15 | [查看](./20260915-app-scoped-requirements/requirement.md) |
 
 ## 状态说明
 
