@@ -11,6 +11,7 @@
 | - | 按 App 归档需求 | Done | 2026-09-15 | [查看](./20260915-app-scoped-requirements/requirement.md) |
 | - | iPhone 静态 Web App / PWA 开发规范 | Done | 2026-09-15 | [查看](./20260915-add-web-pwa-rules/requirement.md) |
 | - | 统一 Web / PWA 又拍云子目录部署规则 | Done | 2026-09-15 | [查看](./20260915-web-pwa-upyun-subpath-deployment/requirement.md) |
+| - | 新增通用开发规则 | Implementing | 2026-09-15 | [查看](./20260915-add-common-rules/requirement.md) |
 
 ## 状态说明
 
