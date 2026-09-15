@@ -1,13 +1,16 @@
-# Requirements
+# 仓库级需求
 
-> 本文件是仓库需求的唯一总清单。每个会导致仓库文件改动的需求，都必须建立独立需求目录并登记在这里。
+> 本文件仅用于登记 **100-ai-apps 仓库级公共需求**，例如 `AGENTS.md`、`rules/`、全局需求模板、CI / CD、仓库脚本和公共基础设施调整。
+>
+> 属于具体 App 的需求不得登记在这里，应登记到 `apps/<app>/docs/requirements/README.md`。
 
-| Requirement ID | Requirement | Status | Created | Document |
+| 需求编号 | 需求 | 状态 | 创建日期 | 文档 |
 |---|---|---|---|---|
-| - | Bootstrap requirement templates | Done | 2026-09-15 | [View](./20260915-bootstrap-requirement-templates/requirement.md) |
-| - | Use uploaded requirement templates | Done | 2026-09-15 | [View](./20260915-use-uploaded-requirement-templates/requirement.md) |
+| - | Bootstrap requirement templates | Done | 2026-09-15 | [查看](./20260915-bootstrap-requirement-templates/requirement.md) |
+| - | Use uploaded requirement templates | Done | 2026-09-15 | [查看](./20260915-use-uploaded-requirement-templates/requirement.md) |
+| - | 按 App 归档需求 | Implementing | 2026-09-15 | [查看](./20260915-app-scoped-requirements/requirement.md) |
 
-## Status
+## 状态说明
 
 - `Proposed`：需求与方案整理中，尚未确认
 - `Approved`：方案已确认，等待实施
