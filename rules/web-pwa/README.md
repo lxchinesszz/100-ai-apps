@@ -488,72 +488,101 @@ dist/assets/...
 
 ---
 
-## 28. 验收标准
+## 28. 图标规范
+
+Web / PWA 项目默认使用 **Font Awesome Free** 作为功能图标库。
+
+React 项目优先通过 npm 使用 Font Awesome 官方 React 包：
+
+```text
+@fortawesome/react-fontawesome
+@fortawesome/fontawesome-svg-core
+@fortawesome/free-solid-svg-icons
+@fortawesome/free-regular-svg-icons
+```
+
+只有需要品牌图标时再引入：
+
+```text
+@fortawesome/free-brands-svg-icons
+```
+
+使用原则：
+
+1. 功能图标优先从 Font Awesome Free 中选择，不为常见功能重复绘制 SVG。
+2. 不使用 Emoji 作为正式功能图标，不使用 Unicode 字符模拟箭头、设置、删除、首页等功能图标。
+3. React 中按具体图标进行 import，默认不全量导入或注册整个图标集，避免无必要增加构建体积。
+4. Font Awesome 必须作为项目依赖参与本地构建，禁止通过第三方 CDN 加载，确保 PWA 离线后核心图标仍然可用。
+5. 同一 App 中相同业务语义必须保持图标一致，例如“首页”“设置”“删除”“返回”不要在不同页面随意更换图标语义。
+6. 图标只作为信息表达和操作识别的一部分，不应为了装饰而大量堆叠。
+7. 当 Font Awesome Free 确实没有满足需求的图标时，可以使用项目内自定义 SVG 作为兜底；自定义 SVG 同样必须随项目构建和部署。
+8. 默认使用 Font Awesome Free，不主动引入 Font Awesome Pro；如需求明确需要 Pro 图标，应先确认授权与依赖变化。
+
+React 示例：
+
+```tsx
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHouse, faGear } from '@fortawesome/free-solid-svg-icons'
+
+<FontAwesomeIcon icon={faHouse} />
+<FontAwesomeIcon icon={faGear} />
+```
+
+UI 设计阶段应尽量给出明确的 Font Awesome 图标语义或图标名称，使 Developer 可以直接实施，而不是重新选择另一套图标库。
+
+---
+
+## 29. 验收标准
 
 AI 完成项目后必须检查：
 
 - [ ] `npm run build` 可以成功执行。
 - [ ] `dist/` 可以独立部署，不需要服务器运行时。
-- [ ] 已定义稳定的英文 `appSlug`。
-- [ ] Vite `base` 为 `/<appSlug>/`。
-- [ ] Manifest `start_url` 和 `scope` 为 `/<appSlug>/`。
-- [ ] App Icon、Manifest、JS、CSS、图片等资源在子目录下正确加载。
-- [ ] Service Worker scope 不越过当前 `/<appSlug>/`。
-- [ ] `dist/` 内文件可直接上传到又拍云 `/<appSlug>/`。
-- [ ] `https://apps.springlearn.cn/<appSlug>/` 可以正常访问。
-- [ ] Hash Router 路由刷新不会 404。
-- [ ] Safari 可以正常访问并添加到 iPhone 主屏幕。
-- [ ] 从桌面启动后以独立 Web App 方式运行。
-- [ ] 页面背景覆盖整个屏幕区域。
-- [ ] 安装后不依赖 Safari 地址栏和浏览器工具栏完成核心操作。
-- [ ] 正确适配 Dynamic Island / 刘海和 Home Indicator。
-- [ ] 不出现顶部、底部异常白边。
-- [ ] 不使用固定手机高度，正确使用 `100dvh`。
-- [ ] 输入框不会触发异常页面放大。
-- [ ] 数据能够保存在本机，刷新页面不会导致数据丢失。
-- [ ] 核心资源不存在不必要的第三方 CDN 依赖。
-- [ ] 已配置 PWA / Manifest / App Icon。
-- [ ] 如果要求离线模式，断网后核心功能仍然可使用。
+- [ ] Vite `base` 与 `/<appSlug>/` 一致。
+- [ ] 又拍云部署目录为 `/<appSlug>/`，且上传的是 `dist/` 内部文件。
+- [ ] 实际 URL 为 `https://apps.springlearn.cn/<appSlug>/`。
+- [ ] Manifest `start_url` / `scope` 与 `/<appSlug>/` 一致。
+- [ ] PWA 图标、Apple Touch Icon、静态资源在子目录下可以正确加载。
+- [ ] Service Worker scope 不越过当前 App 子目录。
+- [ ] Font Awesome 图标通过项目依赖本地构建，不依赖第三方 CDN。
+- [ ] Font Awesome 图标按需导入，没有无必要全量注册整个图标集。
+- [ ] Safari 正常访问。
+- [ ] 添加到主屏幕后可以独立启动。
+- [ ] 页面背景覆盖顶部和底部区域。
+- [ ] 内容不被刘海、Dynamic Island 或 Home Indicator 遮挡。
+- [ ] Header / TabBar 与 Safe Area 正确配合。
+- [ ] 输入框聚焦不会导致页面异常放大。
+- [ ] 核心操作不依赖 Hover。
+- [ ] 核心功能离线后仍可使用。
+- [ ] 页面刷新不会因为路由产生 404。
+- [ ] 不同 App 的缓存不会互相污染。
+- [ ] 375px 到 430px 宽度范围内没有明显布局错误。
+- [ ] 核心流程可完整使用。
+- [ ] 本地数据刷新后仍然存在。
+- [ ] 不存在未经需求确认自行增加的后端服务。
 
 ---
 
-## 29. 最终技术架构
+## 30. 最终原则
 
 ```text
-┌──────────────────────────────┐
-│            iPhone            │
-│                              │
-│    Home Screen Web App       │
-│                              │
-│  React + TypeScript + PWA    │
-│  LocalStorage / IndexedDB    │
-└───────────────┬──────────────┘
-                │
-          首次访问 / 更新
-                │
-                ▼
-https://apps.springlearn.cn/<appSlug>/
-                │
-                ▼
-┌──────────────────────────────┐
-│           又拍云             │
-│                              │
-│       /<appSlug>/            │
-│                              │
-│ HTML / CSS / JS / Assets     │
-└──────────────────────────────┘
+Web 技术实现
++
+静态部署
++
+PWA
++
+Local First
++
+iOS Safe Area
++
+App-like UI
++
+Font Awesome Free
++
+独立 App 子目录部署
 ```
 
-最终原则：
+目标不是“做一个适配手机的网页”，而是：
 
-> 能在浏览器完成的个人工具，优先做成静态 Web App。
-
-> 能保存在本机的数据，不引入服务器。
-
-> 能通过 PWA 获得 App 体验，不为了上架而开发原生 App。
-
-> UI 从第一天就按照 iPhone App 设计，而不是开发完成后再把网页“适配成手机端”。
-
-> 所有 Web / PWA 应用统一发布到 `https://apps.springlearn.cn/<appSlug>/`。
-
-> 最终产物应该做到：打开 Safari → 添加到主屏幕 → 从此以后用户基本不需要意识到它是一个网页。
+> **使用 Web 技术实现一个可以从 iPhone 主屏幕启动、具备完整 App 感、统一图标语言，并且能够稳定部署在 `apps.springlearn.cn/<appSlug>/` 下的轻量应用。**
