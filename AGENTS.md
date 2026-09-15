@@ -27,43 +27,46 @@ Agent 的目标不是尽快修改代码，而是确保每一次代码或仓库�
 
 只要 Agent 识别到任务将导致任何 **代码或仓库文件改动**，就必须进入需求流程。
 
-包括但不限于：
-
-- 新功能或功能调整
-- Bug 修复
-- UI / UX 调整
-- 重构或性能优化
-- 测试补充或修改
-- 配置、构建脚本、CI / CD 修改
-- 依赖升级
-- 文档修改
-- 目录结构调整
-- 文件新增、修改或删除
+包括但不限于：新功能、功能调整、Bug 修复、UI / UX 调整、重构、性能优化、测试、配置、构建脚本、CI / CD、依赖、文档、目录结构和文件增删改。
 
 不得以“改动很小”“只是修 Bug”“只改一行代码”“只补测试/配置/文档”或“不影响业务逻辑”为由跳过。
 
 ### 3.2 可以不创建需求的情况
 
-以下工作在 **不修改任何仓库文件** 时，可以不创建需求目录：
+纯只读查询、代码解释、方案讨论、代码审查和故障诊断，在 **不修改任何仓库文件** 时可以不创建需求目录。
 
-- 纯只读查询
-- 代码解释
-- 方案讨论
-- 代码审查
-- 故障诊断
+一旦后续转为实施修改，必须立即补齐需求文档和对应需求总清单，再进入方案确认和实施流程。
 
-一旦上述任务后续转为实施修改，必须立即停止直接修改，先补齐需求目录、三份需求文档和需求总清单，再进入方案确认与实施流程。
+### 3.3 先判断需求归属
 
-### 3.3 标准流程
+创建需求前，Agent 必须先判断改动属于哪个范围：
 
 ```text
 识别仓库改动
   ↓
-创建需求目录
+是否属于某个具体 App？
+  ├─ 是 → 使用该 App 的需求目录
+  └─ 否 → 是否属于仓库公共能力？
+           ├─ 是 → 使用仓库级需求目录
+           └─ 无法判断 → 先分析或向用户确认归属
+```
+
+不得为了方便把具体 App 需求统一放入根级 `docs/requirements/`。
+
+如果一次任务包含多个相互独立的 App 改动，应按 App 拆分需求，不得把多个无关 App 的需求合并到同一需求目录。
+
+### 3.4 标准流程
+
+```text
+识别仓库改动
   ↓
-从模板创建三份需求文档
+判断 App 级 / 仓库级归属
   ↓
-登记 docs/requirements/README.md
+创建对应需求目录
+  ↓
+从全局模板创建三份需求文档
+  ↓
+登记对应需求总清单
   ↓
 完成需求方案
   ↓
@@ -79,7 +82,7 @@ Agent 的目标不是尽快修改代码，而是确保每一次代码或仓库�
   ↓
 更新三份文档的实际结果
   ↓
-更新需求总清单状态
+更新对应需求总清单状态
 ```
 
 在用户确认方案前，只允许分析问题、阅读代码、澄清需求和完善文档，不得修改业务代码。
@@ -88,45 +91,62 @@ Agent 的目标不是尽快修改代码，而是确保每一次代码或仓库�
 
 ## 4. Requirement Directory
 
-所有需求统一存放在：
+### 4.1 App 级需求
+
+属于某个具体 App 的需求必须放在对应 App 内：
 
 ```text
-docs/requirements/
-```
-
-每次需求都必须建立独立目录，不得把多个无关需求合并归档。
-
-目录命名格式：
-
-```text
-docs/requirements/<YYYYMMDD>-<requirement-slug>/
+apps/<app>/docs/requirements/<YYYYMMDD>-<requirement-slug>/
 ```
 
 例如：
 
 ```text
-docs/requirements/
-├── README.md
-├── _template/
-├── 20260915-add-checkin/
-├── 20260915-fix-budget-calc/
-└── 20260916-pwa-fullscreen/
+apps/001-speaking-training/
+└── docs/
+    └── requirements/
+        ├── README.md
+        ├── 20260915-add-checkin/
+        │   ├── requirement.md
+        │   ├── technical-design.md
+        │   └── change-list.md
+        └── 20260916-pwa-fullscreen/
+            ├── requirement.md
+            ├── technical-design.md
+            └── change-list.md
 ```
 
-其中：
+每个 App 独立维护自己的需求历史，不与其他 App 混合归档。
+
+### 4.2 仓库级需求
+
+仅当需求修改的是仓库公共能力时，才使用根级：
+
+```text
+docs/requirements/<YYYYMMDD>-<requirement-slug>/
+```
+
+典型仓库级需求包括：
+
+- `AGENTS.md`
+- `rules/`
+- 全局需求模板
+- CI / CD
+- 仓库级构建或管理脚本
+- 跨 App 公共基础设施
+
+### 4.3 目录命名
+
+需求目录统一使用：
+
+```text
+<YYYYMMDD>-<requirement-slug>
+```
 
 - `YYYYMMDD`：需求创建日期。
 - `requirement-slug`：简短英文 kebab-case 标识。
 - 一个独立问题对应一个需求目录。
-- 如果存在正式需求编号，应在该目录的需求文档和需求总清单中同时记录该编号。
-
-新需求文档必须从：
-
-```text
-docs/requirements/_template/
-```
-
-复制后填写，不应每次自由创建不同格式。
+- 如果存在正式需求编号，应在需求文档和对应需求总清单中同时记录。
 
 ---
 
@@ -135,153 +155,46 @@ docs/requirements/_template/
 每个需求目录必须包含：
 
 ```text
-docs/requirements/<YYYYMMDD>-<requirement-slug>/
-├── requirement.md
-├── technical-design.md
-└── change-list.md
+requirement.md
+technical-design.md
+change-list.md
 ```
 
 三份文档缺一不可，并且必须随需求澄清、方案调整和实际实施结果持续同步更新。
 
-### 5.1 requirement.md — 需求方案
-
-用于定义“为什么做、做什么、做到什么程度”。
-
-至少包含：
-
-```markdown
-# Requirement
-
-## Requirement ID
-无正式编号时写“无”。
-
-## Background
-为什么提出这个需求。
-
-## Problem
-当前存在什么问题。
-
-## Goal
-希望达到什么结果。
-
-## User / Scenario
-谁在什么场景下使用。
-
-## Scope
-本次包含哪些内容。
-
-## Out of Scope
-明确本次不处理什么。
-
-## Acceptance Criteria
-- [ ] 可观察、可验证的验收项
-```
-
-### 5.2 technical-design.md — 技术方案
-
-用于定义“准备怎么实现”。
-
-至少包含：
-
-```markdown
-# Technical Design
-
-## Requirement ID
-无正式编号时写“无”。
-
-## Current State
-现有实现、相关模块和代码情况。
-
-## Proposed Solution
-准备采用的实现方案。
-
-## Architecture / Flow
-涉及的架构、调用链或数据流。
-
-## Data / API / Storage
-数据库、接口、状态、缓存、本地存储等影响；无则写“无”。
-
-## Compatibility
-兼容性和已有功能影响；无则写“无”。
-
-## Risks
-可能产生的风险。
-
-## Alternatives
-其他合理方案以及未采用原因；无则写“无”。
-
-## Implementation Steps
-具体实施步骤。
-
-## Verification Plan
-计划如何验证实现结果。
-```
-
-### 5.3 change-list.md — 改动点
-
-用于同时记录 **计划改动** 和 **实际改动**。
-
-实施前必须填写计划范围，至少包含：
-
-```markdown
-# Change List
-
-## Requirement ID
-无正式编号时写“无”。
-
-## Planned Changes
-
-### Files
-计划新增 / 修改 / 删除哪些文件。
-
-### Database
-数据库影响；无则写“无”。
-
-### API
-接口影响；无则写“无”。
-
-### Configuration
-配置影响；无则写“无”。
-
-### Tests
-计划新增或调整的测试；无则写“无”。
-
-## Actual Changes
-实施完成后填写实际修改文件和实际影响。
-
-## Verification Result
-记录执行的验证方式、结果及未解决问题。
-```
-
-任何无改动的类别都必须明确填写 **“无”**，不得省略，以便 Agent 和人工审查时区分“没有影响”和“忘记分析”。
+文件内容必须使用仓库全局模板，不得自行创建另一套结构。
 
 ---
 
 ## 6. Requirement Registry
 
-需求总清单固定为：
+需求总清单按归属分别维护。
+
+### 6.1 App 级需求总清单
+
+具体 App 使用：
+
+```text
+apps/<app>/docs/requirements/README.md
+```
+
+第一次为某个 App 创建需求时，如果该文件不存在，必须同步创建。
+
+App 级需求只能登记在对应 App 的需求总清单中。
+
+### 6.2 仓库级需求总清单
+
+仓库公共需求使用：
 
 ```text
 docs/requirements/README.md
 ```
 
-这是仓库需求的唯一总索引。
+该文件只登记仓库级公共需求，不登记具体 App 的业务需求。
 
-每创建一个新需求目录，Agent 必须立即在总清单新增一条记录，并使用相对链接指向需求目录或 `requirement.md`。
+### 6.3 登记要求
 
-不得只创建需求目录而遗漏总清单。
-
-推荐格式：
-
-```markdown
-# Requirements
-
-| Requirement ID | Requirement | Status | Created | Document |
-|---|---|---|---|---|
-| - | Add Check-in | Proposed | 2026-09-15 | [View](./20260915-add-checkin/requirement.md) |
-```
-
-如果存在正式需求编号，用真实编号替换 `-`。
+每创建一个需求目录，必须立即在对应总清单新增一条相对链接，不得只创建目录而遗漏清单。
 
 状态统一使用：
 
@@ -297,13 +210,7 @@ Archived
 标准流转：
 
 ```text
-Proposed
-   ↓
-Approved
-   ↓
-Implementing
-   ↓
-Done
+Proposed → Approved → Implementing → Done
 ```
 
 需求澄清和方案设计阶段保持 `Proposed`。
@@ -312,7 +219,7 @@ Done
 
 ## 7. Template Rules
 
-需求模板固定存放在：
+全仓库只维护一套公共需求模板：
 
 ```text
 docs/requirements/_template/
@@ -321,7 +228,9 @@ docs/requirements/_template/
 └── change-list.md
 ```
 
-新需求必须以模板为基础复制创建。
+无论 App 级还是仓库级需求，都必须从这里复制三份模板。
+
+不要在每个 App 下复制 `_template/`，避免模板分叉和长期不一致。
 
 模板发生升级时：
 
@@ -338,24 +247,14 @@ docs/requirements/_template/
 1. `requirement.md` 需求方案。
 2. `technical-design.md` 技术方案。
 3. `change-list.md` 计划改动范围。
-4. `docs/requirements/README.md` 总清单登记。
+4. 对应 App 级或仓库级需求总清单登记。
 5. 用户方案确认。
 
-Agent 向用户确认方案时，应至少说明：
-
-- 对需求和问题的理解。
-- 推荐解决方案。
-- 核心技术实现。
-- 预计修改范围。
-- 数据库 / API / 配置影响。
-- 风险和兼容性影响。
-- 验证方式。
-
-**用户未确认时，只允许分析和完善方案，不实施业务代码。**
+用户未确认时，只允许分析和完善方案，不实施业务代码。
 
 用户明确表达“可以”“同意”“开始”“执行”“按这个方案做”等含义时，可以视为确认。
 
-如果用户明确要求“不要确认，直接实施”，仍然必须先建立需求目录、三份文档并登记总清单；完成这些记录后可以直接进入实施。
+如果用户明确要求“不要确认，直接实施”，仍然必须先建立需求目录、三份文档并登记对应总清单；完成记录后可以直接进入实施。
 
 ---
 
@@ -363,37 +262,31 @@ Agent 向用户确认方案时，应至少说明：
 
 方案确认后：
 
-1. 将总清单状态更新为 `Approved` / `Implementing`。
+1. 将对应需求总清单状态更新为 `Approved` / `Implementing`。
 2. 按 `technical-design.md` 实施。
 3. 不顺手修改与当前需求无关的问题。
 4. 不进行未经记录的大范围重构。
-5. 实际修改范围与计划不一致时，必须同步更新 `change-list.md`。
-6. 技术方案发生变化时，必须同步更新 `technical-design.md`。
-7. 需求 Scope 或验收标准发生变化时，必须同步更新 `requirement.md`。
-8. 如果变化会扩大 Scope、改变核心交互、架构、数据模型或外部接口，应重新取得用户确认后继续。
+5. 实际修改范围与计划不一致时，同步更新 `change-list.md`。
+6. 技术方案变化时，同步更新 `technical-design.md`。
+7. 需求范围或验收标准变化时，同步更新 `requirement.md`。
+8. 如果变化会扩大 Scope、改变核心交互、架构、数据模型或外部接口，应重新取得用户确认。
 
-需求文档必须描述 **当前真实状态**，不能只保留最初方案。
+需求文档必须描述当前真实状态，不能只保留最初方案。
 
 ---
 
 ## 10. Completion Rules
 
-代码完成不代表需求完成。
+实施完成后必须：
 
-实施完成后，Agent 必须：
-
-1. 在 `change-list.md` 补充实际新增、修改、删除的文件。
-2. 补充实际数据库影响；无则写“无”。
-3. 补充实际 API 影响；无则写“无”。
-4. 补充实际配置影响；无则写“无”。
-5. 记录测试和验证结果。
-6. 对照 `requirement.md` 的 Acceptance Criteria 验收。
-7. 记录未解决问题和已知限制。
-8. 验收通过后将 `docs/requirements/README.md` 状态更新为 `Done`。
+1. 在 `change-list.md` 补充实际新增、修改、删除文件。
+2. 补充实际数据库、API、配置和文档影响；无则明确写“无”。
+3. 记录测试和验证结果。
+4. 对照 `requirement.md` 的验收标准验收。
+5. 记录未解决问题和已知限制。
+6. 验收通过后，将对应 App 级或仓库级需求总清单状态更新为 `Done`。
 
 如果验收失败，不得标记为 `Done`。
-
-完成定义：
 
 ```text
 Requirement Recorded
@@ -412,8 +305,6 @@ Requirement Recorded
 
 开发任何 App 前，Agent 必须先读取通用规则，再根据应用类型读取对应平台规则。
 
-规划目录：
-
 ```text
 rules/
 ├── common/
@@ -421,8 +312,6 @@ rules/
 ├── mini-program/
 └── desktop/
 ```
-
-加载规则：
 
 ```text
 所有项目
@@ -441,15 +330,15 @@ Web / PWA
 → rules/desktop/
 ```
 
-不要加载与当前项目无关的平台规则，避免无效上下文和规则冲突。
+不要加载与当前项目无关的平台规则。
 
-如果对应规则目录尚不存在，则遵循本 `AGENTS.md`，并在方案中明确当前缺少的平台规则，不得自行虚构规则。
+如果对应规则目录尚不存在，则遵循本 `AGENTS.md`，并在方案中明确缺少的平台规则，不得自行虚构规则。
 
 ---
 
 ## 12. Priority
 
-发生规则冲突时，在仓库规则范围内按以下优先级处理：
+发生规则冲突时：
 
 ```text
 用户当前明确指令
@@ -467,18 +356,16 @@ Web / PWA
 
 高优先级规则覆盖低优先级规则。
 
-但 **Mandatory Change Workflow 属于仓库强制流程，不得因为低层级项目习惯而跳过。**
+但 Mandatory Change Workflow 属于仓库强制流程，不得因为低层级项目习惯而跳过。
 
 ---
 
 ## 13. Agent Working Principle
 
-Agent 在本仓库中的工作方式：
-
-> 先记录需求，再确认方案；先明确改动范围，再修改代码；文档跟随真实实施同步更新；所有变更可追踪，所有结果可验证。
+> 先判断需求归属，再记录需求；先确认方案，再修改代码；文档跟随真实实施同步更新；所有变更可追踪，所有结果可验证。
 
 不要把“快速生成代码”作为第一目标。
 
 第一目标是：
 
-**持续建立一套可复用、可审查、可追踪的 AI 产品开发工程体系。**
+**持续建立一套适用于 100 个 App、可复用、可审查、可追踪的 AI 产品开发工程体系。**
