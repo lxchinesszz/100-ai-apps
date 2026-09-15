@@ -9,6 +9,7 @@
 | - | Bootstrap requirement templates | Done | 2026-09-15 | [查看](./20260915-bootstrap-requirement-templates/requirement.md) |
 | - | Use uploaded requirement templates | Done | 2026-09-15 | [查看](./20260915-use-uploaded-requirement-templates/requirement.md) |
 | - | 按 App 归档需求 | Done | 2026-09-15 | [查看](./20260915-app-scoped-requirements/requirement.md) |
+| - | 新增 Web / PWA 开发规则 | Proposed | 2026-09-15 | [查看](./20260915-add-web-pwa-rules/requirement.md) |
 
 ## 状态说明
 
