@@ -4,7 +4,7 @@
 
 | Requirement ID | Requirement | Status | Created | Document |
 |---|---|---|---|---|
-| - | Bootstrap requirement templates | Implementing | 2026-09-15 | [View](./20260915-bootstrap-requirement-templates/requirement.md) |
+| - | Bootstrap requirement templates | Done | 2026-09-15 | [View](./20260915-bootstrap-requirement-templates/requirement.md) |
 
 ## Status
 
