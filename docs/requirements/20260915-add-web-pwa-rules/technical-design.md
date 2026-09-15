@@ -1,47 +1,65 @@
-# 技术方案：新增 Web / PWA 开发规则
+# 技术方案：新增 iPhone 静态 Web App / PWA 开发规范
 
 ## 现状分析
 
-根级 `AGENTS.md` 已规定 Web / PWA 项目应加载 `rules/common/` 和 `rules/web-pwa/`，但当前尚未建立 Web / PWA 平台规则文件。因此 Agent 只能依赖 AGENTS.md 的原则，缺少可直接执行的平台工程约束。
+根级 `AGENTS.md` 已规定 Web / PWA 项目加载 `rules/web-pwa/`，但该目录尚未建立。原计划拆分 `architecture.md`、`ui.md`、`storage.md`、`pwa.md`、`deployment.md`，更偏通用 Web 工程规范。
+
+用户已提供一份完整的 28 节《iPhone 静态 Web App / PWA 开发规范》，其定位和约束高度统一，核心不是“通用 Web 开发”，而是“通过 Safari 添加到 iPhone 主屏幕运行的纯静态 App”。
 
 ## 方案设计
 
-建立模块化规则目录：
+第一版不再拆成六份规则文件，改为一个权威入口文件：
 
 ```text
 rules/web-pwa/
-├── README.md
-├── architecture.md
-├── ui.md
-├── storage.md
-├── pwa.md
-└── deployment.md
+└── README.md
 ```
 
-职责：
+原因：
 
-- `README.md`：平台定位、默认技术栈、规则加载顺序、关键决策原则和其他规则文件索引。
-- `architecture.md`：纯前端优先、项目结构、依赖边界、网络能力和后端引入条件。
-- `ui.md`：Mobile First、响应式、触控、安全区域、视口、状态反馈和基础可访问性。
-- `storage.md`：LocalStorage / IndexedDB / 云端存储的选择条件、版本和容错原则。
-- `pwa.md`：manifest、Service Worker、standalone、离线、安装、更新和 iOS 主屏幕体验。
-- `deployment.md`：静态构建、环境变量、资源路径、缓存策略、对象存储 / CDN 部署和发布验证。
+- 用户提供的 28 节内容本身已经形成完整规范。
+- 单文件可避免 AI 只加载部分文件而遗漏关键 iPhone / PWA 约束。
+- 后续规则规模明显增长时，再按主题拆分；README 始终作为完整入口和加载入口。
 
-规则采用“默认值 + 允许升级条件”的方式，避免把所有 Web App 做成复杂架构。
-
-默认技术路线：
+`README.md` 按用户提供的 28 个主题组织，保留其核心技术口径、示例代码和最终架构：
 
 ```text
-React + TypeScript + Vite + Tailwind CSS
-        ↓
-纯前端静态应用
-        ↓
-LocalStorage / IndexedDB
-        ↓ 真实跨设备/共享/服务端需求出现时
-Serverless / 云服务
-        ↓ 复杂服务端能力明确需要时
-独立 Backend
+Static Web App
++
+PWA
++
+Local First
 ```
+
+默认技术栈：
+
+```text
+React
+TypeScript
+Vite
+Tailwind CSS
+PWA
+localStorage / IndexedDB
+```
+
+强制运行边界：
+
+```text
+纯静态
+无 Node.js 服务端
+无 Java 服务端
+无数据库服务器
+无 SSR
+无 Serverless API 依赖
+npm run build
+→ dist/
+→ HTTPS Static Hosting
+→ Safari
+→ 添加到主屏幕
+→ Standalone Web App
+```
+
+规则同时覆盖：Manifest、Apple meta、Apple Touch Icon、100dvh、Safe Area、导航、滚动、Touch、输入缩放、本地数据、Service Worker、离线、资源本地化、字体、路由、更新、iPhone 尺寸、横屏、主题色、AI 开发约束、AI UI 设计原则、验收标准和最终架构。
 
 ## 接口与数据影响
 
@@ -52,20 +70,23 @@ Serverless / 云服务
 
 ## 兼容性与风险
 
-- 已存在项目不要求机械迁移技术栈。
-- Tailwind CSS 作为默认选项，不应阻止已有项目继续使用自身稳定样式方案。
-- PWA 在 iOS Safari 和 Chromium 上能力不同，规则中需要避免承诺浏览器不支持的能力。
-- Service Worker 缓存策略若写得过度激进会导致版本更新问题，因此规则应要求应用壳与业务数据分离处理。
+- 本规则是 `100-ai-apps` 中 iPhone 静态 Web App / PWA 的默认平台规范，不等同于所有类型 Web 产品的通用规范。
+- 若未来某 App 明确需要账号、跨设备同步、多人协作或服务端能力，应通过该 App 的独立需求和技术方案明确偏离本默认规则，而不是由 AI 擅自升级架构。
+- iOS / Safari 的具体 PWA 能力会随系统版本变化；本规范聚焦稳定的工程原则，不承诺原生 App 的全部系统能力。
+- Service Worker 仅在需要离线体验时强制使用；使用时必须处理缓存版本与更新策略，避免旧资源长期滞留。
 
 ## 验证方案
 
-1. 检查六份规则文件均存在。
-2. 检查 README 能独立告诉 Agent 应加载哪些文件。
-3. 检查规则覆盖架构、UI、存储、PWA、部署。
-4. 检查规则不存在具体 App 业务逻辑。
-5. 检查规则与 AGENTS.md 的“简单、低成本、静态优先、本地优先”原则一致。
+1. 检查 `rules/web-pwa/README.md` 存在。
+2. 检查 README 覆盖用户提供的 28 个主题。
+3. 检查明确 `Static Web App + PWA + Local First`。
+4. 检查明确禁止默认增加后端、Serverless 和云数据库。
+5. 检查包含 iPhone Safe Area、100dvh、standalone、Apple meta 和主屏幕安装规则。
+6. 检查包含 localStorage / IndexedDB、Hash Router、Service Worker、更新策略和静态部署规则。
+7. 检查包含最终验收标准。
+8. 检查没有修改具体 App。
 
 ## 方案确认
 
-- 确认状态：待确认
-- 确认记录：等待用户确认文件拆分和第一版规则范围。
+- 确认状态：已确认
+- 确认记录：2026-09-15，用户明确提供规范并要求“规则按照这个重写”。
