@@ -14,6 +14,7 @@
 | - | 新增通用开发规则 | Done | 2026-09-15 | [查看](./20260915-add-common-rules/requirement.md) |
 | - | 新增 Codex 子智能体研发团队 | Done | 2026-09-15 | [查看](./20260915-add-codex-subagents/requirement.md) |
 | - | Codex 子智能体描述中文化 | Done | 2026-09-15 | [查看](./20260915-localize-codex-agents/requirement.md) |
+| - | Web / PWA 统一使用 Font Awesome 图标库 | Implementing | 2026-09-15 | [查看](./20260915-font-awesome-web-pwa/requirement.md) |
 
 ## 状态说明
 
