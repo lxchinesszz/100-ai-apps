@@ -5,7 +5,7 @@
 | Requirement ID | Requirement | Status | Created | Document |
 |---|---|---|---|---|
 | - | Bootstrap requirement templates | Done | 2026-09-15 | [View](./20260915-bootstrap-requirement-templates/requirement.md) |
-| - | Use uploaded requirement templates | Implementing | 2026-09-15 | [View](./20260915-use-uploaded-requirement-templates/requirement.md) |
+| - | Use uploaded requirement templates | Done | 2026-09-15 | [View](./20260915-use-uploaded-requirement-templates/requirement.md) |
 
 ## Status
 
