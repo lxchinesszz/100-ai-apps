@@ -88,6 +88,82 @@ env(safe-area-inset-right)
 
 Header / Navbar 与 TabBar / Toolbar 默认固定，不随业务内容滚动。
 
+### 4.1 Bottom Safe Area 单一责任原则
+
+底部 Safe Area 只能由一个层级负责，禁止 App Shell、Main Content、TabBar / Toolbar 多层重复叠加 `env(safe-area-inset-bottom)`。
+
+默认职责固定为：
+
+```text
+App Shell
+- 负责 100dvh
+- 不额外增加 bottom safe area
+
+Main Content
+- flex: 1
+- min-height: 0
+- 不预留 TabBar 高度
+- 不重复增加 bottom safe area
+
+TabBar / Bottom Toolbar
+- 作为 flex: none 占据正常布局空间
+- 自己负责 env(safe-area-inset-bottom)
+```
+
+推荐基线：
+
+```css
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-tabbar {
+  flex: none;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+```
+
+禁止以下重复占位：
+
+```text
+App Shell padding-bottom: env(safe-area-inset-bottom)
++
+Main Content 为 TabBar 再预留 bottom padding
++
+TabBar 自己再次 padding-bottom: env(safe-area-inset-bottom)
+```
+
+如果 TabBar / Toolbar 已在正常 Flex / Grid 布局流中占据高度，Main Content 不得再人为预留一份 TabBar 高度；只有 TabBar 使用脱离文档流的 `position: fixed` / `absolute` 时，才允许 Main Content 按实际遮挡高度进行明确补偿，并且仍只能计算一次 Safe Area。
+
+添加到 iPhone 主屏幕后，TabBar 下方只应存在正常 Home Indicator 安全区，不得出现明显高于系统安全区的大块空白。发现底部异常空白时，优先检查：
+
+1. `env(safe-area-inset-bottom)` 是否被多个层级重复使用。
+2. Main Content 是否同时预留了 TabBar 高度和 Safe Area。
+3. Konsta `Tabbar` / `Toolbar` 自身是否已经处理底部安全区。
+4. App Shell 是否同时存在 `100dvh` 与额外 bottom padding / margin。
+5. `body` / `#root` 与 App Shell 背景色不同，导致未覆盖区域被误认为额外空白。
+
 ---
 
 ## 5. 页面滚动
@@ -164,6 +240,8 @@ App Shell 使用 `dvh` 跟随 Safari 地址栏变化与横竖屏切换。
 - 根节点没有 document 级纵向滚动。
 - Safari 地址栏变化后 App Shell 仍贴合当前视口。
 - Safe Area、Dynamic Island、Home Indicator 不遮挡内容。
+- Bottom Safe Area 只由一个层级负责，不存在重复 padding / 占位。
+- 添加到主屏幕后 TabBar 下方只保留正常 Home Indicator 安全区，不出现异常大块空白。
 - 内部滚动区工作正常，固定区域不随内容移动。
 - 键盘弹出后核心操作可达。
 - 输入框不会导致页面异常放大。
