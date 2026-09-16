@@ -15,6 +15,12 @@
 | - | 新增 Codex 子智能体研发团队 | Done | 2026-09-15 | [查看](./20260915-add-codex-subagents/requirement.md) |
 | - | Codex 子智能体描述中文化 | Done | 2026-09-15 | [查看](./20260915-localize-codex-agents/requirement.md) |
 | - | Web / PWA 统一使用 Font Awesome 图标库 | Done | 2026-09-15 | [查看](./20260915-font-awesome-web-pwa/requirement.md) |
+| - | 所有 Agent 单轮只询问一个问题 | Done | 2026-09-15 | [查看](./20260915-single-question-interview/requirement.md) |
+| - | 新增 Web / PWA 又拍云发布脚本规范 | Done | 2026-09-15 | [查看](./20260915-add-web-pwa-upyun-script/requirement.md) |
+| - | 锁定 Web / PWA App Shell 滚动 | Done | 2026-09-15 | [查看](./20260915-lock-web-pwa-app-shell/requirement.md) |
+| - | 新 App 识别与归档流程 | Done | 2026-09-16 | [查看](./20260916-new-app-intake-workflow/requirement.md) |
+| - | Web/PWA 公共部署脚本 | Done | 2026-09-16 | [查看](./20260916-shared-web-pwa-deploy-script/requirement.md) |
+| - | 又拍云凭证钥匙串兜底 | Done | 2026-09-16 | [查看](./20260916-upyun-keychain-credentials/requirement.md) |
 
 ## 状态说明
 

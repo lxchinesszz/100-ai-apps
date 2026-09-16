@@ -146,11 +146,13 @@ Apple Touch Icon 必须兼容应用子目录，例如：
 
 App 背景必须能够延伸到屏幕顶部和底部。
 
+默认情况下，整个 App 必须作为固定在当前可用视口内的 App Shell 运行。不得让 `document` 随业务内容增长并像普通网页一样上下滚动；需要滚动的内容必须放入明确指定的内部滚动区。
+
 ---
 
 ## 7. 禁止直接使用 100vh
 
-业务主容器不要简单使用 `height: 100vh`，优先：
+业务主容器不要简单使用 `height: 100vh`。`100vh` 在 iOS Safari 地址栏变化时可能不等于当前可见高度；优先使用动态视口单位，并同时锁定根节点滚动：
 
 ```css
 html,
@@ -158,15 +160,29 @@ body,
 #root {
   margin: 0;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-body,
-#root,
 .app {
-  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
 }
 ```
+
+如果必须兼容不支持 `dvh` 的旧环境，可以先用 `100vh` 作为回退，再由 `100dvh` 覆盖：
+
+```css
+.app {
+  height: 100vh;
+  height: 100dvh;
+}
+```
+
+不要把根容器改回 `min-height: 100dvh` 来容纳长内容；这会允许 App Shell 被内容撑高并重新产生 document 级滚动。横竖屏切换和 Safari 浏览器栏展开或收起后，App Shell 必须继续匹配更新后的动态视口。
 
 ---
 
@@ -222,7 +238,7 @@ env(safe-area-inset-right)
 
 ## 11. 页面滚动
 
-默认采用：
+默认采用固定 App Shell 和指定内容区独立滚动：
 
 ```text
 App Shell 固定
@@ -240,6 +256,61 @@ App
 ```
 
 Header 和 TabBar 不应随整个浏览器页面一起滚动。
+
+推荐基线：
+
+```css
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-header,
+.tabbar {
+  flex: none;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+```
+
+布局使用 Grid 时同样必须允许滚动轨道收缩，例如将中间轨道声明为 `minmax(0, 1fr)`。仅设置 `overflow-y: auto` 而不设置 `min-height: 0` 或等效约束，可能仍会由内容撑高外壳。
+
+滚动行为必须满足：
+
+- 短内容不产生滚动条；上下拖动不得移动整个 App、露出根背景或形成额外空白。
+- 长内容只在 `.app-main` 或其他显式业务滚动容器内滚动，Header、TabBar 和 App Shell 保持固定。
+- 内部滚动区使用 `overscroll-behavior-y: contain` 阻止滚动到达首尾后继续传递给外层 document；不得依赖 JavaScript 全局拦截全部触摸事件作为常规方案。
+- `overscroll-behavior` 控制的是网页滚动链，不能保证关闭所有 iOS 系统级边缘手势。验收重点是 document 不发生位移、根背景不露出、核心操作保持可达，不承诺移除操作系统手势。
+
+动态视口、Safe Area 和输入法必须一起验证：
+
+- App Shell 使用 `dvh` 跟随 Safari 浏览器栏和横竖屏变化；顶部、底部固定区域仍按第 8～10 节叠加 Safe Area。
+- Safe Area 空间应计入 Header、TabBar 或内容区内边距，不得额外把 App Shell 撑出视口。
+- 软键盘出现时，聚焦输入框、关联提示和提交操作必须可见、可滚动到达。表单页可以让指定内容区响应视觉视口变化，但不得解除根节点滚动锁定或以裁切焦点元素作为代价。
+
+### 11.1 受控例外
+
+文章阅读、长文档等确实需要整页自然滚动的页面可以例外。例外必须在该 App 的 `requirement.md` 和 `technical-design.md` 中明确记录适用页面、用户价值、滚动边界以及 Header / 操作区行为，不能因为实现方便而默认启用 document 级滚动。
 
 ---
 
@@ -488,7 +559,38 @@ dist/assets/...
 
 ---
 
-## 28. 图标规范
+## 28. 又拍云公共发布脚本
+
+所有 Web / PWA App 必须统一调用仓库根目录 `scripts/youpai-sync.mjs`，不得将其复制到 App 内维护。公共脚本固定使用又拍云服务 `100-ai-apps` 和访问域名 `https://apps.springlearn.cn`，只依赖 Node.js 内置模块。
+
+调用格式：
+
+```text
+node <repo>/scripts/youpai-sync.mjs <localDir> <remoteDir>
+```
+
+- `localDir` 必须是存在的目录；脚本递归上传目录内部文件，不额外嵌套本地目录名。
+- `remoteDir` 必须显式传入，格式为非根、单层 kebab-case 路径 `/<appSlug>/`；禁止 `/`、多层路径、点段和非法字符。
+- 凭证按字段独立解析，优先使用 `UPYUN_OPERATOR` 和 `UPYUN_PASSWORD` 环境变量；macOS 上仅当某字段缺失时，才以当前 `os.userInfo().username` 为 account，从系统钥匙串读取对应 service：操作员使用 `100-ai-apps-upyun-operator`，密码使用 `100-ai-apps-upyun-password`。
+- 非 macOS 不使用钥匙串兜底，必须提供完整环境变量；钥匙串项目缺失、为空或不可读时发布必须终止。凭证不得写入脚本、提交文件、构建产物或日志，错误信息也不得包含凭证值。
+- 发布采用逐文件 PUT 直接覆盖，不备份、不 GET 回读校验、不 DELETE 远端旧文件。
+- 参数、本地目录、远程目录和凭证校验必须在首个网络请求之前完成。
+
+每个 App 的 `package.json` 必须由 `deploy` 命令先完成生产构建，再从 App 目录调用公共脚本并显式传入目标。例如：
+
+```json
+{
+  "scripts": {
+    "deploy": "npm run build && node ../../scripts/youpai-sync.mjs dist /speaking-training/"
+  }
+}
+```
+
+默认 `appSlug` 是 App 目录移除三位序号前缀后的名称，但公共脚本不得自动推断部署目标；App 必须显式传入与 Vite base、Manifest `start_url` 和 `scope` 一致的远程目录。
+
+---
+
+## 29. 图标规范
 
 Web / PWA 项目默认使用 **Font Awesome Free** 作为功能图标库。
 
@@ -532,7 +634,7 @@ UI 设计阶段应尽量给出明确的 Font Awesome 图标语义或图标名称
 
 ---
 
-## 29. 验收标准
+## 30. 验收标准
 
 AI 完成项目后必须检查：
 
@@ -549,8 +651,15 @@ AI 完成项目后必须检查：
 - [ ] Safari 正常访问。
 - [ ] 添加到主屏幕后可以独立启动。
 - [ ] 页面背景覆盖顶部和底部区域。
+- [ ] `html`、`body`、应用挂载节点和 App Shell 不产生 document 级纵向滚动。
+- [ ] 短内容页面上下拖动时 App Shell 不位移、不露出根背景、不出现多余空白。
+- [ ] 长内容只在显式内容区内滚动，Header 和 TabBar 不随内容移动。
+- [ ] 内部滚动到达首尾后不会把滚动链继续传递给 document。
 - [ ] 内容不被刘海、Dynamic Island 或 Home Indicator 遮挡。
 - [ ] Header / TabBar 与 Safe Area 正确配合。
+- [ ] Safari 浏览器栏变化及横竖屏切换后，App Shell 仍匹配当前可用视口。
+- [ ] 软键盘出现和收起时，焦点元素及关键操作仍可见、可达，且不会恢复 document 级滚动。
+- [ ] 如启用整页滚动例外，已在对应 App 的需求和技术方案中记录理由与边界。
 - [ ] 输入框聚焦不会导致页面异常放大。
 - [ ] 核心操作不依赖 Hover。
 - [ ] 核心功能离线后仍可使用。
@@ -563,7 +672,7 @@ AI 完成项目后必须检查：
 
 ---
 
-## 30. 最终原则
+## 31. 最终原则
 
 ```text
 Web 技术实现
