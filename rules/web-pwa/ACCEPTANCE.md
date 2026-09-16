@@ -26,6 +26,8 @@
 - [ ] Safari 浏览器栏变化及横竖屏切换后 App Shell 仍匹配当前视口。
 - [ ] Safe Area、Dynamic Island、Home Indicator 不遮挡内容。
 - [ ] 软键盘出现和收起时，焦点元素与关键操作仍可见、可达。
+- [ ] 当前 Focus 输入控件在软键盘弹起后完整处于 Visual Viewport 可见区域，并与键盘顶部保留合理间距。
+- [ ] Sheet / Popup 等浮层内表单在软键盘弹起后仍可滚动、输入和提交。
 - [ ] 输入框聚焦不会导致页面异常放大。
 - [ ] 375px 到 430px 常见宽度范围没有明显布局错误。
 
@@ -39,6 +41,8 @@
 - [ ] 列表型内容优先使用 List / ListItem，而不是默认 Card 化。
 - [ ] 创建、编辑、筛选、选择等短流程优先考虑 Sheet。
 - [ ] 没有使用浏览器原生 `alert()` / `confirm()` 作为正式产品 UI。
+- [ ] 输入控件 Focus 后没有浏览器默认蓝色 `outline`、Tailwind `ring`、蓝色 `border` 或其他非 iOS 风格 Focus Ring。
+- [ ] 移除网页式 Focus Ring 后，输入控件仍通过光标或轻量 iOS 风格状态提供清晰焦点反馈。
 - [ ] 核心操作点击区域至少 `44 × 44px`。
 - [ ] 核心功能不依赖 hover。
 - [ ] 页面整体呈现 App 感而不是网页感。
