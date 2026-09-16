@@ -293,6 +293,58 @@ ListInput / ListItem
 
 而不是把所有表单字段都做成独立大卡片。
 
+### 12.1 iOS Focus 样式
+
+输入控件获得焦点后，禁止出现浏览器默认蓝色 `outline`、Tailwind `ring`、蓝色 `border` 或其他明显的网页式 Focus Ring。
+
+Konsta 组件存在默认焦点样式时，应通过组件 props、CSS Variables、className 或统一全局样式覆盖为符合 iOS App 视觉的焦点状态，不得因为 Konsta 默认样式而保留网页式蓝框。
+
+基础兜底样式可以统一配置：
+
+```css
+input,
+textarea,
+select,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+```
+
+同时检查并移除输入组件上的：
+
+```text
+focus:ring-*
+focus:border-blue-*
+focus:outline-*
+```
+
+移除蓝色 Focus Ring 不代表输入控件可以没有任何状态反馈。触摸场景中可以通过光标、背景、分隔线、标签状态或其他轻量 iOS 风格变化表达焦点，但不得重新制造一圈明显的 Web Focus Border。
+
+对于需要键盘导航的桌面可访问性场景，不应无条件移除所有非输入控件的可见焦点反馈；本规则重点约束 iPhone PWA 中输入控件的网页式蓝框。
+
+### 12.2 软键盘与输入控件可见性
+
+输入框或文本域获得焦点并弹出 iOS 软键盘后：
+
+- 当前 Focus 输入控件必须完整处于 Visual Viewport 可见区域。
+- 输入控件、标签、输入内容和关键提交操作不得被键盘或 Safari 输入辅助区域遮挡。
+- 焦点元素与键盘顶部之间应保留合理间距，不应刚好贴住或被覆盖。
+- 必要时滚动的是明确的业务滚动容器，不得因此解除根节点滚动锁定。
+- Sheet、Popup 等浮层内存在表单时，同样必须处理键盘导致的可视区域缩小。
+- 不得通过固定高度、强制裁切或隐藏内容来规避键盘问题。
+
 ---
 
 ## 13. Sheet / Popup 规则
@@ -445,6 +497,7 @@ Floating Action Button
 大量阴影
 大面积装饰性玻璃卡片
 Emoji 功能图标
+输入控件网页式蓝色 Focus Ring
 ```
 
 业务明确需要时可以例外，但必须有产品理由，而不是因为 AI 模板默认如此。
@@ -549,6 +602,9 @@ Konsta 标准组件
 - [ ] 创建、编辑、筛选、选择等短流程优先考虑 Sheet。
 - [ ] 没有使用浏览器原生 alert / confirm 作为正式 UI。
 - [ ] 输入框字体不小于 16px。
+- [ ] 输入控件 Focus 后没有浏览器默认蓝色 outline、Tailwind ring 或非 iOS 风格焦点边框。
+- [ ] iOS 软键盘弹起后，当前输入控件完整可见，并与键盘顶部保留合理间距。
+- [ ] Sheet / Popup 内表单在键盘弹起后仍可完整操作。
 - [ ] 核心触摸区域不小于 44 × 44px。
 - [ ] 页面继续满足 Safe Area、100dvh、内部滚动区和 Home Indicator 规则。
 - [ ] 没有 Material Design / Android 风格组件混入 iOS Theme。
