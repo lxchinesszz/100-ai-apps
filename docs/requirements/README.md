@@ -21,6 +21,8 @@
 | - | 新 App 识别与归档流程 | Done | 2026-09-16 | [查看](./20260916-new-app-intake-workflow/requirement.md) |
 | - | Web/PWA 公共部署脚本 | Done | 2026-09-16 | [查看](./20260916-shared-web-pwa-deploy-script/requirement.md) |
 | - | 又拍云凭证钥匙串兜底 | Done | 2026-09-16 | [查看](./20260916-upyun-keychain-credentials/requirement.md) |
+| - | Web/PWA 规则与 create-pwa-app 模板对齐 | Done | 2026-09-16 | [查看](./20260916-align-web-pwa-rules-with-starter/requirement.md) |
+| - | Web/PWA 规则文件中文命名 | Done | 2026-09-16 | [查看](./20260916-rename-web-pwa-rule-files/requirement.md) |
 
 ## 状态说明
 
