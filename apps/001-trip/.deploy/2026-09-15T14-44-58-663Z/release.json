@@ -1,0 +1,173 @@
+{
+  "service": "ai-skills",
+  "remoteBase": "/trip/",
+  "createdAt": "2026-09-15T14:45:00.665Z",
+  "previous": [
+    "assets/check-DwLiiVzB.js",
+    "assets/db-BkTDBl6Q.css",
+    "assets/db-DCQJY4lF.js",
+    "assets/input-CiDswAMe.css",
+    "assets/input-ZRWZcJ8t.js",
+    "assets/repository-Be4N1csR.js",
+    "assets/repository-Clk8ZhFo.css",
+    "assets/rolldown-runtime-qXqUbbKo.js",
+    "assets/TripDetail-_pIIgAeK.css",
+    "assets/TripForm-jlju7gOT.js",
+    "assets/TripForm-k2BtgT67.css",
+    "assets/workbox-window.prod.es5-Bd17z0YL.js",
+    "covers/city.svg",
+    "covers/coast.svg",
+    "covers/lake.svg",
+    "covers/mountain.svg",
+    "icons/apple-touch-icon.png",
+    "icons/icon-192.png",
+    "icons/icon-512.png",
+    "icons/maskable-512.png",
+    "workbox-2fbc6a65.js",
+    "manifest.webmanifest",
+    "index.html",
+    "sw.js"
+  ],
+  "files": [
+    {
+      "path": "/trip/assets/BackupPage-B816ZuIX.js",
+      "bytes": 6670,
+      "sha256": "52e529778c72d891b1663ed3ed6a130a625d0512c33419547579a1346f285db4"
+    },
+    {
+      "path": "/trip/assets/check-DwLiiVzB.js",
+      "bytes": 150,
+      "sha256": "8f67b0ae47349f0473a8fe96be520de9f48f0f35b280b833b8776a8d38b02a47"
+    },
+    {
+      "path": "/trip/assets/db-BkTDBl6Q.css",
+      "bytes": 9049,
+      "sha256": "619f8b3832dda434bd19918eb94a54ca98a5c3e50e8818e7c2279dca3a7a9409"
+    },
+    {
+      "path": "/trip/assets/db-DCQJY4lF.js",
+      "bytes": 418620,
+      "sha256": "beadbfcd8dcedba3b37991132fc58b98506a4e8f6348c0fab658f7d7ab187eb8"
+    },
+    {
+      "path": "/trip/assets/index-CcAc8poI.css",
+      "bytes": 20149,
+      "sha256": "5984702ee07d589f2b9c09ca3e40079a300f7730e0e459fc5ed12beb0c4edbd8"
+    },
+    {
+      "path": "/trip/assets/index-CTksQuAf.js",
+      "bytes": 13141,
+      "sha256": "aa9ca397de34d9426d3f31eb6d60c26141dad89b897a5a83c8d804bf6f1856f1"
+    },
+    {
+      "path": "/trip/assets/input-CiDswAMe.css",
+      "bytes": 2752,
+      "sha256": "4aa39069307c7d2b7bf5e7256b7958e43d6ef303b64b55e73e8045514b368a2e"
+    },
+    {
+      "path": "/trip/assets/input-ZRWZcJ8t.js",
+      "bytes": 28068,
+      "sha256": "071f6a3796766fa7272a111fc5d9a06c25c87a5d479459dfb5890be352aefdcd"
+    },
+    {
+      "path": "/trip/assets/repository-Be4N1csR.js",
+      "bytes": 8625,
+      "sha256": "3efc51bf33756e75b347b7e002139a8d7863cf45381e2f5d748b91f668b3c27f"
+    },
+    {
+      "path": "/trip/assets/repository-Clk8ZhFo.css",
+      "bytes": 1098,
+      "sha256": "0dce32dbad95b36bdf0d061acae7cba00ba84c77242ef7456b1edd24948d9dc0"
+    },
+    {
+      "path": "/trip/assets/rolldown-runtime-qXqUbbKo.js",
+      "bytes": 773,
+      "sha256": "c3c7bb289a8868119b16b8239f24a2a8e00e0b7424a4b42a20ff03416b1cec51"
+    },
+    {
+      "path": "/trip/assets/TripDetail-_pIIgAeK.css",
+      "bytes": 3788,
+      "sha256": "e96108b13b67c4350600db9e80efdc48d76c129edda68c56d91d846a470a68ad"
+    },
+    {
+      "path": "/trip/assets/TripDetail-BjuKHp_P.js",
+      "bytes": 21201,
+      "sha256": "3a7774fea4e5b78e5a8c5b9fa91e8602a9155852b3f394875a443f0e9d5aa29c"
+    },
+    {
+      "path": "/trip/assets/TripForm-jlju7gOT.js",
+      "bytes": 47310,
+      "sha256": "603db50889eb8bce36a81c7301a56a810388b6c9bb64bd7ca28538609c6e9e7a"
+    },
+    {
+      "path": "/trip/assets/TripForm-k2BtgT67.css",
+      "bytes": 4933,
+      "sha256": "f47f07968a0b87658d5f6e037c56b4e98170be26e96c4d7df81c1033132f2121"
+    },
+    {
+      "path": "/trip/assets/workbox-window.prod.es5-Bd17z0YL.js",
+      "bytes": 5653,
+      "sha256": "17bcc17d60dc78f927834b880c39649b03af46fd1f5cdbb8c42c5ae2b515dce9"
+    },
+    {
+      "path": "/trip/covers/city.svg",
+      "bytes": 1248,
+      "sha256": "b0bf13ef051594f248a64dc37c887f284b1604916d4e24c2b4eb1b9ce63bbd51"
+    },
+    {
+      "path": "/trip/covers/coast.svg",
+      "bytes": 1454,
+      "sha256": "b6292ca836a249e551ed432d49b79aa9feb118e7fd855239d4e0959d8b004360"
+    },
+    {
+      "path": "/trip/covers/lake.svg",
+      "bytes": 1117,
+      "sha256": "4669e6ca6b8b670370f78ecdb627c6b0b07a6f29524e8c56eb31e554cc0263d1"
+    },
+    {
+      "path": "/trip/covers/mountain.svg",
+      "bytes": 830,
+      "sha256": "480cec8c23f2ab70054dd339f5c0d0d36905a72681e84b738021f84c943d8851"
+    },
+    {
+      "path": "/trip/icons/apple-touch-icon.png",
+      "bytes": 2960,
+      "sha256": "5667e44e145bea08cfb0ea1f5de628aacf3d6e908e49c38b84f89252c3a05af1"
+    },
+    {
+      "path": "/trip/icons/icon-192.png",
+      "bytes": 3188,
+      "sha256": "5b5c7b7fd4a9ee0cec4f677240d62ecd68feabd84f2d59590d4983478f17e976"
+    },
+    {
+      "path": "/trip/icons/icon-512.png",
+      "bytes": 10854,
+      "sha256": "d556ed3d01a0123d9c96b303ccbd9bc49634e614f4c2e702fbc8bf29b2277db6"
+    },
+    {
+      "path": "/trip/icons/maskable-512.png",
+      "bytes": 10854,
+      "sha256": "d556ed3d01a0123d9c96b303ccbd9bc49634e614f4c2e702fbc8bf29b2277db6"
+    },
+    {
+      "path": "/trip/workbox-2fbc6a65.js",
+      "bytes": 15026,
+      "sha256": "39c2e6ae44c3f29666f6a328b6523bf13a053a1d95c74af8ddea82b1045b0b6e"
+    },
+    {
+      "path": "/trip/manifest.webmanifest",
+      "bytes": 499,
+      "sha256": "b3717bb81daf8fa6732c1b2d3623213ac30eacb755a94db7751bf66352c52a61"
+    },
+    {
+      "path": "/trip/index.html",
+      "bytes": 1365,
+      "sha256": "6f0fa2d5d94ab3c9c7de419621b17e86da6251373d87974b0abb66c4864aeeed"
+    },
+    {
+      "path": "/trip/sw.js",
+      "bytes": 3055,
+      "sha256": "2cf8740c21f7dddcfdff813cd73352510e208de30dbcedd7f1a729cd32efede6"
+    }
+  ]
+}
