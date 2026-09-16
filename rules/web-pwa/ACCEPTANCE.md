@@ -25,6 +25,10 @@
 - [ ] 内部滚动到首尾后不会继续把滚动链传给 document。
 - [ ] Safari 浏览器栏变化及横竖屏切换后 App Shell 仍匹配当前视口。
 - [ ] Safe Area、Dynamic Island、Home Indicator 不遮挡内容。
+- [ ] Bottom Safe Area 只由一个层级负责，没有 App Shell、Main Content、TabBar / Toolbar 多层重复叠加 `env(safe-area-inset-bottom)`。
+- [ ] TabBar / Toolbar 已在正常布局流中占据高度时，Main Content 没有再次预留 TabBar 高度。
+- [ ] 添加到主屏幕后，TabBar 下方只保留正常 Home Indicator 安全区，不出现明显异常的大块底部空白。
+- [ ] `body` / `#root` / App Shell 背景覆盖一致，不会因未覆盖区域暴露而形成假性底部空白。
 - [ ] 软键盘出现和收起时，焦点元素与关键操作仍可见、可达。
 - [ ] 当前 Focus 输入控件在软键盘弹起后完整处于 Visual Viewport 可见区域，并与键盘顶部保留合理间距。
 - [ ] Sheet / Popup 等浮层内表单在软键盘弹起后仍可滚动、输入和提交。
